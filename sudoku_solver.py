@@ -589,6 +589,11 @@ for c in range(init_clue_length):
     p = init_solved_p[c]
     P[9*i+j][0] = p
     
+'''
+Here I could go through and remove the solved elements from neighbor lists of the
+unsolved elements; might speed things up slightly
+'''
+    
     
 # build the solved index list S
 S = []
