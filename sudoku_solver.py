@@ -11,14 +11,13 @@ be displayed as zeros in the output.
 """
 
 import time
-import copy
+
 
 
 
 #
 # SPECIAL FUNCTIONS
 #-----------------------------------------------------------------------------
-
 
 def countbits(n):
     '''
@@ -222,7 +221,8 @@ def pigeon(PP,SS,QQ):
         remove those bits from the non-matching row, column, or grid members.
         
     At the moment, it is unclear whether this function can be derived from the 
-    other three rules.
+    other rules. As it does not appear to improve the solver, it is currently 
+    left out of the reduction loops.
     '''
     for i in rng9:
         i_checkspots = list(set(range(9*i,9*(i+1))).intersection(QQ))
@@ -352,7 +352,19 @@ def pipe(PP,SS,QQ):
     return PP, SS, QQ
 
 
-def reduceloop(PP,SS,QQ):
+def checkstatus(PP):
+    '''
+    The checkstatus function:
+        Returns False if any puzzle value is a zero, and True otherwise.
+    '''
+    check = True
+    for p in PP:
+        if p[0] == 0:
+            check = False
+    return check
+
+
+def reduceloop(PP,SS,QQ,goodcheck=False):
     '''
     The reduction loop algorithm:
         Loop a series of the reduction functions over the puzzle until the puzzle
@@ -373,6 +385,9 @@ def reduceloop(PP,SS,QQ):
         new_P = [q[0] for q in PP]
         keep_going = not (old_P == new_P)
         trials += 1
+        if goodcheck:
+            goodness = checkstatus(PP)
+            keep_going &= goodness
     return PP,SS,QQ,trials
 
 
@@ -394,19 +409,71 @@ def leastpopular(PP,QQ):
     while tracked[0][0] == 0:
         tracked = tracked[1:]
     return tracked
+
+
+def puzzlecopy(X):
+    '''
+    The puzzle copy function:
+        Replicate the input puzzle that functions like a deep copy. Is significantly
+        faster than using copy.deepcopy().
+    '''
+    clone = [[0+x[0],[]+x[1],[]+x[2],[]+x[3]] for x in X]
+    return clone
+
+
+def fancyprint(X):
+    '''
+    The fancy print function:
+        Print the untranslated puzzle solution in sudoku format. Useful for 
+        debugging.
+    '''
+    print('\n')
+    for row in rng9:
+        Y = X[9*row:9*row+9]
+        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
+        if 0<row and row<8 and (row % 3) == 2:
+            print('---------------------------------------------------')
+
             
-
-def checkstatus(PP):
+def fanciestprint(X):
     '''
-    The checkstatus function:
-        Returns False if any puzzle value is a zero, and True otherwise.
+    The fanciest print function:
+        Print the translated puzzle solution in sudoku format.
     '''
-    check = True
-    for p in PP:
-        if p[0] == 0:
-            check = False
-    return check
-
+    print('\n')
+    for row in rng9:
+        Y = X[9*row:9*row+9]
+        for index,y in enumerate(Y):
+            if countbits(y) == 1:
+                cnt = 0
+                while y > 0:
+                    y>>=1
+                    cnt+=1
+                Y[index] = cnt
+            else:
+                Y[index] = 0
+        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
+        if 0<row and row<8 and (row % 3) == 2:
+            print('---------------------------------')
+            
+            
+def ugliestprint(X):
+    '''
+    The ugliest print function:
+        Print the binary expression of the solved puzzle in sudoku format. Useful
+        for debugging.
+    '''
+    print('\n')
+    for row in rng9:
+        Y = X[9*row:9*row+9]
+        for index,y in enumerate(Y):
+            if countbits(y) == 1:
+                Y[index] = '         '
+            else:
+                Y[index] = (bin(y)[2:]).zfill(9)
+        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
+        if 0<row and row<8 and (row % 3) == 2:
+            print('---------------------------------')
 
 #-----------------------------------------------------------------------------
 #
@@ -465,20 +532,21 @@ Clues should be given to solver in the following form:\n
 where i is the row of the clue (1-9), j is the column (1-9), and v is the value. 
 Separate clues using colons, for example the following:\n
       235:941:628\n
-signifies three clues: the 2nd row, 3rd column is 5, the 9th row, 4th column is 1
+signifies three clues: the 2nd row, 3rd column is 5, the 9th row, 4th column is 1,
 and the 6th row, 2nd column is 8.
 ---------------------------------------------------------------------------------
       ''') 
 
+# get input from user
 innie = input('Please enter clues in the format as prompted above: ')
-
-cut_no = 0
 
 # initialize the solved cells and define acceptable inputs
 init_solved_i = []
 init_solved_j = []
 init_solved_p = []
 accepted = ['1','2','3','4','5','6','7','8','9']
+
+cut_no = 0
 
 while len(innie)>0:
     if cut_no % 2 == 1:
@@ -493,7 +561,7 @@ while len(innie)>0:
             new_j = int(newclue[1])-1
             new_p = 2**(int(newclue[2])-1)
         else:
-            raise Exception('')
+            raise Exception('Clue digits outside acceptable range (1-9)')
         init_solved_i.append(new_i)
         init_solved_j.append(new_j)
         init_solved_p.append(new_p)
@@ -518,6 +586,7 @@ for c in range(init_clue_length):
     j = init_solved_j[c]
     p = init_solved_p[c]
     P[9*i+j][0] = p
+    
     
 # build the solved index list S
 S = []
@@ -546,32 +615,51 @@ P,S,Q,trialsA = reduceloop(P,S,Q)
 trialsB = 0
 trialsC = 0
 
+
 # if the puzzle isn't solved, test each choice and remove ones that lead to a contradiction
+''' I would like to implement this with a function, but when the for loop is
+    placed inside a function the deepcopy of P does not appear to work properly.
+    More thought needs to be put into this; at the moment, the loop tests the 
+    removal of every single bit, whereas the puzzle might be solvable by 
+    reduceloop() after only a few iterations of the for loop below (this was the
+    idea behind the leastpopular function).
+    
+    This is obviously the part of the code that can be sped up the most.
+    '''
+
 if len(Q) != 0:
     what_next = leastpopular(P,Q)
     for nxt in range(len(what_next)):
-        test_trials = what_next[nxt][0]
         test_bit = 1<<what_next[nxt][1]
         test_spots = what_next[nxt][2]
         for q in test_spots:
-            dum_P = copy.deepcopy(P) # necessary because P is not a list of primitives 
+            dum_P = puzzlecopy(P)
             dum_S = S[:]
             dum_Q = Q[:]
             dum_P[q][0] = test_bit
-            dum_S.append(q)
-            dum_Q.remove(q)
-            dum_P,dum_S,dum_Q,dead = reduceloop(dum_P,dum_S,dum_Q)
+            dum_S.append(q) # evidently unnecessary, but I'm not exactly sure why, so it stays for now
+            dum_Q.remove(q) # ditto
+            dum_P,dum_S,dum_Q,dead = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
             trialsB += dead
             if not checkstatus(dum_P):
                 P[q][0] = P[q][0] - (P[q][0] & test_bit)
-                
+            
+    # update the list of unsolved indices (also evidently unnecessary)
+    newS = []
+    for q in Q:
+        if countbits(P[q][0]) == 1:
+            newS.append(q)
+    S = newS
+    Q = listdiff(Q,S)
+    
+
     # run reduction loop again
     P,S,Q, trialsC = reduceloop(P,S,Q)
-    
-    
+
+
 end_time = time.time()
 print('\nCalculation time: ',end_time-start_time,'s')
-print('Reduction Loops: ',trialsA+trialsB+trialsC)
+print('Reduction loops: ',trialsA+trialsB+trialsC)
     
 #-----------------------------------------------------------------------------
 #
@@ -579,52 +667,13 @@ print('Reduction Loops: ',trialsA+trialsB+trialsC)
 
 
 
-
-simpleP = [q[0] for q in P]
-
-def fancyprint(X):
-    print('\n')
-    for row in rng9:
-        Y = X[9*row:9*row+9]
-        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
-        if 0<row and row<8 and (row % 3) == 2:
-            print('---------------------------------------------------')
-            
-def fanciestprint(X):
-    print('\n')
-    for row in rng9:
-        Y = X[9*row:9*row+9]
-        for index,y in enumerate(Y):
-            if countbits(y) == 1:
-                cnt = 0
-                while y > 0:
-                    y>>=1
-                    cnt+=1
-                Y[index] = cnt
-            else:
-                Y[index] = 0
-        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
-        if 0<row and row<8 and (row % 3) == 2:
-            print('---------------------------------')
-            
-            
-def ugliestprint(X):
-    print('\n')
-    for row in rng9:
-        Y = X[9*row:9*row+9]
-        for index,y in enumerate(Y):
-            if countbits(y) == 1:
-                Y[index] = '         '
-            else:
-                Y[index] = (bin(y)[2:]).zfill(9)
-        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
-        if 0<row and row<8 and (row % 3) == 2:
-            print('---------------------------------')
         
 #
 # PRINT THE SOLVED PUZZLE
 #-----------------------------------------------------------------------------
 
+# just the cell value piece of the puzzle object P
+simpleP = [q[0] for q in P]
 
 #fancyprint(simpleP)
 #ugliestprint(simpleP)  
