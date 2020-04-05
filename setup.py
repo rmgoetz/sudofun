@@ -17,5 +17,5 @@ setup(name='sudofun',
       author='Ryan Goetz',
       author_email='ryan.m.goetz@gmail.com',
       license='MIT',
-      packages=['sudofun'],
+      packages=['sudofun','sudofun.functions'],
       zip_safe=False)

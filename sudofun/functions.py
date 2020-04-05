@@ -81,26 +81,35 @@ def solve(cluestring,**kwargs):
     timer   = kwargs.pop('timer',None)
     loops   = kwargs.pop('loops',None)  
     verbose = kwargs.pop('verbose',None)
+    binform = kwargs.pop('binform',None)
     
+    # handle the keyword arguments
     if timer is None:
         timer = False
     elif not isinstance(timer,bool):
-        print('timer variable not specified as Boolean; thereby defaulted to False')
+        print('timer argument not specified as Boolean; thereby defaulted to False')
         timer = False
         
     if loops is None:
         loops = False
     elif not isinstance(loops,bool):
-        print('loops variable not specified as Boolean; thereby defaulted to False')
+        print('loops argument not specified as Boolean; thereby defaulted to False')
         loops = False
         
     if verbose is None:
         pass
     elif not isinstance(verbose,bool):
-        print('verbose variable not specified as Boolean; thereby ignored')
+        print('verbose argument not specified as Boolean; thereby ignored')
     elif verbose is True:
         timer = True
         loops = True
+        
+    if binform is None:
+        binform = False
+    elif not isinstance(binform,bool):
+        print('binform argument not specified as Boolean; thereby defaulted to False')
+        binform = False
+        
     
     if not isinstance(cluestring,str):
         raise Exception('Clue must be formatted as a string')
@@ -113,9 +122,9 @@ def solve(cluestring,**kwargs):
     
     # add these clue solutions to P
     for c in range(clue_len):
-        i = init_solved_i[c]
-        j = init_solved_j[c]
-        p = init_solved_p[c]
+        i = init_i[c]
+        j = init_j[c]
+        p = init_p[c]
         P[9*i+j][0] = p
         
     # build the solved index list S
@@ -126,6 +135,14 @@ def solve(cluestring,**kwargs):
         
     # define the unsolved index list Q
     Q = listdiff(rng81,S)
+    
+    if verbose:
+        print('\nInput Puzzle:')
+        if binform:
+            ugliestprint([p[0] for p in P])
+        else:
+            fanciestprint([p[0] for p in P])
+        print('\n')
 
     if timer:
         start_time = time.time()
@@ -150,11 +167,14 @@ def solve(cluestring,**kwargs):
     if loops:
         print('Reduction loops: ',trialsA+trialsB+trialsC)
 
-    # just the cell value piece of the puzzle object P
-    simpleP = [p[0] for p in P]
- 
+    
     # print the solved puzzle
-    fanciestprint(simpleP) 
+    if verbose:
+        print('\nSolved Puzzle:')
+    if binform:
+        ugliestprint([p[0] for p in P])
+    else:
+        fanciestprint([p[0] for p in P]) 
 #-----------------------------------------------------------------------------
 #
 #  
@@ -182,7 +202,7 @@ def strike(PP,SS,QQ):
             for j_bud in PP[s][2]:
                 PP[j_bud][0] = PP[j_bud][0] - (PP[j_bud][0] & p)
                 if s in PP[j_bud][2]: PP[j_bud][2].remove(s)
-            for g_bud in P[s][3]:
+            for g_bud in PP[s][3]:
                 PP[g_bud][0] = PP[g_bud][0] - (PP[g_bud][0] & p)
                 if s in PP[g_bud][3]: PP[g_bud][3].remove(s)
         # update the list of newly solved, and unsolved indices
@@ -821,13 +841,10 @@ def ugliestprint(X):
     for row in rng9:
         Y = X[9*row:9*row+9]
         for index,y in enumerate(Y):
-            if countbits(y) == 1:
-                Y[index] = '         '
-            else:
-                Y[index] = (bin(y)[2:]).zfill(9)
+            Y[index] = (bin(y)[2:]).zfill(9)
         print(Y[:3],'|',Y[3:6],'|',Y[6:9])
         if 0<row and row<8 and (row % 3) == 2:
-            print('---------------------------------')
+            print('---------------------------------------------------------------------------------------------------------------------------')
 #-----------------------------------------------------------------------------
 #
 #  

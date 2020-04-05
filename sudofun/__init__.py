@@ -6,4 +6,5 @@ from __future__ import with_statement
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-from functions import *
+import sudofun.functions as fun
+from sudofun.functions import *

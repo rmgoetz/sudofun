@@ -64,7 +64,7 @@ def strike(PP,SS,QQ):
             for j_bud in PP[s][2]:
                 PP[j_bud][0] = PP[j_bud][0] - (PP[j_bud][0] & p)
                 if s in PP[j_bud][2]: PP[j_bud][2].remove(s)
-            for g_bud in P[s][3]:
+            for g_bud in PP[s][3]:
                 PP[g_bud][0] = PP[g_bud][0] - (PP[g_bud][0] & p)
                 if s in PP[g_bud][3]: PP[g_bud][3].remove(s)
         # update the list of newly solved, and unsolved indices
