@@ -23,45 +23,45 @@ Table of Contents:
     
     Reduction Functions:
         
-        strike -------------------------------- Line 167
+        strike -------------------------------- Line 187
         
-        unique -------------------------------- Line 207
+        unique -------------------------------- Line 227
         
-        squeeze ------------------------------- Line 261
+        squeeze ------------------------------- Line 281
         
-        pipe ---------------------------------- Line 359
+        pipe ---------------------------------- Line 379
         
-        pigeon -------------------------------- Line 456
+        pigeon -------------------------------- Line 476
         
-        reduceloop ---------------------------- Line 512
+        reduceloop ---------------------------- Line 532
         
-        seek_and_destroy ---------------------- Line 550
+        seek_and_destroy ---------------------- Line 570
         
         
     Auxiliary Functions:
         
-        countbits ----------------------------- Line 586
+        countbits ----------------------------- Line 606
         
-        listdiff ------------------------------ Line 606
+        listdiff ------------------------------ Line 626
         
-        init_puzzle --------------------------- Line 622
+        init_puzzle --------------------------- Line 642
         
-        puzzlecopy ---------------------------- Line 652
+        puzzlecopy ---------------------------- Line 672
         
-        checkstatus --------------------------- Line 669
+        checkstatus --------------------------- Line 689
         
-        translate_clues ----------------------- Line 688
+        translate_clues ----------------------- Line 708
         
-        leastpopular -------------------------- Line 737
+        leastpopular -------------------------- Line 757
         
         
     Print Functions:
         
-        fancyprint ---------------------------- Line 764
+        fancyprint ---------------------------- Line 784
         
-        fanciestprint ------------------------- Line 785
+        fanciestprint ------------------------- Line 805
         
-        ugliestprint -------------------------- Line 814
+        ugliestprint -------------------------- Line 834
         
   
 Last line check: April 5, 2020
