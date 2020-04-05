@@ -4,10 +4,10 @@ import time
 """
 Created on Sun Apr  5 01:26:43 2020
 
-This code allows the user to input a series of clues to a sudoku puzzle, and
-will output the (possibly partially) solved puzzle. Any unsolved squares will
-be displayed as zeros in the output. The tool will not fully solve a puzzle
-that is not fully determined.
+This module contains code which allows the user to input a series of clues to 
+a sudoku puzzle, and obtain the (possibly partially) solved puzzle. Any unsolved 
+squares will be displayed as zeros in the output. The tool will not fully solve a 
+puzzle that is not fully determined.
 
 
 @author: Ryan Goetz, ryan.m.goetz@gmail.com
