@@ -4,7 +4,8 @@ Created on Thu Apr  2 00:03:13 2020
 
 This code allows the user to input a series of clues to a sudoku puzzle, and
 will output the (possibly partially) solved puzzle. Any unsolved squares will
-be displayed as zeros in the output.
+be displayed as zeros in the output. The script will not fully solve a puzzle
+that is not fully determined.
 
 
 @author: Ryan Goetz
@@ -12,6 +13,10 @@ be displayed as zeros in the output.
 
 import time
 
+
+# define some useful index ranges as lists
+rng9  = [x for x in range(9)]
+rng81 = [x for x in range(81)]
 
 
 
@@ -144,7 +149,7 @@ def squeeze(PP,SS,QQ):
         # if the first partition has unique bits, remove them from the grid neighbors
         if first_unq != 0:
             g    = 3*(i//3)
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,i_checkspots[0:3])
             for q in g_checkspots:
@@ -152,7 +157,7 @@ def squeeze(PP,SS,QQ):
         # if the second partition has unique bits, remove them from the grid neighbors
         if second_unq != 0:
             g    = 3*(i//3)+1
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,i_checkspots[3:6])
             for q in g_checkspots:
@@ -160,14 +165,14 @@ def squeeze(PP,SS,QQ):
         # if the third partition has unique bits, remove them from the grid neighbors
         if third_unq != 0:
             g    = 3*(i//3)+2
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,i_checkspots[6:9])
             for q in g_checkspots:
                 PP[q][0] = PP[q][0] - (PP[q][0] & third_unq)
     # now examine the columns
     for j in rng9:
-        j_checkspots = [j+9*n for n in range(9)]
+        j_checkspots = [j+9*n for n in rng9]
         j_checkvals  = [PP[q][0] for q in j_checkspots]
         subrows      = [0,0,0]
         for n in range(3):
@@ -181,7 +186,7 @@ def squeeze(PP,SS,QQ):
         # if the first partition has unique bits, remove them from the grid neighbors
         if first_unq != 0:
             g    = j//3
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,j_checkspots[0:3])
             for q in g_checkspots:
@@ -189,7 +194,7 @@ def squeeze(PP,SS,QQ):
         # if the second partition has unique bits, remove them from the grid neighbors
         if second_unq != 0:
             g    = (j//3)+3
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,j_checkspots[3:6])
             for q in g_checkspots:
@@ -197,7 +202,7 @@ def squeeze(PP,SS,QQ):
         # if the third partition has unique bits, remove them from the grid neighbors
         if third_unq != 0:
             g    = (j//3)+6
-            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+            grid = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
             g_checkspots = list(set(grid).intersection(QQ))
             g_checkspots = listdiff(g_checkspots,j_checkspots[6:9])
             for q in g_checkspots:
@@ -234,7 +239,7 @@ def pigeon(PP,SS,QQ):
                 for q in i_checkspots:
                     if PP[q][0] != v: PP[q][0] = PP[q][0] - (PP[q][0] & v)
     for j in rng9:
-        j_checkspots = list(set([j+9*n for n in range(9)]).intersection(QQ))
+        j_checkspots = list(set([j+9*n for n in rng9]).intersection(QQ))
         j_checkvals  = [PP[q][0] for q in j_checkspots]
         for v in j_checkvals:
             bits = countbits(v)
@@ -243,7 +248,7 @@ def pigeon(PP,SS,QQ):
                 for q in j_checkspots:
                     if PP[q][0] != v: PP[q][0] = PP[q][0] - (PP[q][0] & v)
     for g in rng9:
-        grids = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+        grids = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
         g_checkspots = list(set(grids).intersection(QQ))
         g_checkvals  = [PP[q][0] for q in g_checkspots]
         for v in g_checkvals:
@@ -270,9 +275,9 @@ def pipe(PP,SS,QQ):
         row/column members outside the grid
     '''
     for g in rng9:
-        grids = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in range(9)]
+        grids = [ 9*(3*(g // 3)+(n // 3))+3*(g % 3)+(n % 3) for n in rng9]
         g_checkspots = list(set(grids).intersection(QQ))
-        g_checkvals = [PP[q][0] for q in g_checkspots]
+        g_checkvals  = [PP[q][0] for q in g_checkspots]
         bit_multiplicity = [0 for _ in rng9]
         W = [[] for _ in rng9]
         # find the multiplicity of each bit in the grid and record corresponding indices
@@ -294,7 +299,7 @@ def pipe(PP,SS,QQ):
             # for all of the doubled bits, check if the cells share a row or column
             for bit in which_bits_double:
                 if len(W[bit]) != 0:
-                    romeo = W[bit][0] 
+                    romeo  = W[bit][0] 
                     juliet = W[bit][1]
                     # if they share a row, find the row and remove the bit from all other members
                     if romeo//9 == juliet//9:
@@ -307,7 +312,7 @@ def pipe(PP,SS,QQ):
                     # if they share a column, find the column and remove the bit from all other members
                     elif romeo % 9 == juliet % 9:
                         j = romeo % 9
-                        rj_row = list(set([j+9*n for n in range(9)]).intersection(QQ))
+                        rj_row = list(set([j+9*n for n in rng9]).intersection(QQ))
                         rj_row = listdiff(rj_row,W[bit])
                         bit_as_int = 1<<bit
                         for q in rj_row:
@@ -337,7 +342,7 @@ def pipe(PP,SS,QQ):
                     # if they share a column, find the column and remove the bit from all other members
                     elif larry % 9 == curly % 9 == mo % 9:
                         j = larry % 9
-                        stooge_row = list(set([j+9*n for n in range(9)]).intersection(QQ))
+                        stooge_row = list(set([j+9*n for n in rng9]).intersection(QQ))
                         stooge_row = listdiff(stooge_row,W[bit])
                         bit_as_int = 1<<bit
                         for q in stooge_row:
@@ -388,7 +393,11 @@ def reduceloop(PP,SS,QQ,goodcheck=False):
         if goodcheck:
             goodness = checkstatus(PP)
             keep_going &= goodness
-    return PP,SS,QQ,trials
+            
+    if goodcheck:
+        return PP,SS,QQ,trials,goodness
+    else:
+        return PP,SS,QQ,trials
 
 
 def leastpopular(PP,QQ):
@@ -483,15 +492,9 @@ def ugliestprint(X):
         
 
 #
-# INITIALIZE CERTAIN OBJECT TO PREPARE FOR INPUTS
+# INITIALIZE THE UNSOLVED PUZZLE
 #-----------------------------------------------------------------------------
 
-# define some useful index ranges as lists
-rng9 = [x for x in range(9)]
-rng81 = [x for x in range(81)]
-
-
-# initialize and fill the unsolved puzzle
 P = []
 for k in rng81:
     i = k // 9
@@ -511,7 +514,6 @@ for k in rng81:
     j_nbr.remove(k)
     g_nbr.remove(k)
     P.append([511,i_nbr,j_nbr,g_nbr]) # 511 = 0b111111111
-
 
 #-----------------------------------------------------------------------------
 #
@@ -603,6 +605,7 @@ Q = listdiff(rng81,S)
 
 
 
+
 #
 # PERFORM REDUCTION ON PUZZLE
 #-----------------------------------------------------------------------------
@@ -626,11 +629,10 @@ trialsC = 0
     
     This is obviously the part of the code that can be sped up the most.
     '''
-
 if len(Q) != 0:
     what_next = leastpopular(P,Q)
     for nxt in range(len(what_next)):
-        test_bit = 1<<what_next[nxt][1]
+        test_bit   = 1<<what_next[nxt][1]
         test_spots = what_next[nxt][2]
         for q in test_spots:
             dum_P = puzzlecopy(P)
@@ -639,9 +641,9 @@ if len(Q) != 0:
             dum_P[q][0] = test_bit
             dum_S.append(q) # evidently unnecessary, but I'm not exactly sure why, so it stays for now
             dum_Q.remove(q) # ditto
-            dum_P,dum_S,dum_Q,dead = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
-            trialsB += dead
-            if not checkstatus(dum_P):
+            dum_P,dum_S,dum_Q,tries,alive = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
+            trialsB += tries
+            if not alive:
                 P[q][0] = P[q][0] - (P[q][0] & test_bit)
             
     # update the list of unsolved indices (also evidently unnecessary)
@@ -652,10 +654,8 @@ if len(Q) != 0:
     S = newS
     Q = listdiff(Q,S)
     
-
     # run reduction loop again
     P,S,Q, trialsC = reduceloop(P,S,Q)
-
 
 end_time = time.time()
 print('\nCalculation time: ',end_time-start_time,'s')
@@ -675,6 +675,7 @@ print('Reduction loops: ',trialsA+trialsB+trialsC)
 # just the cell value piece of the puzzle object P
 simpleP = [q[0] for q in P]
 
+# some other printouts useful for debugging
 #fancyprint(simpleP)
 #ugliestprint(simpleP)  
 
