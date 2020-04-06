@@ -12,7 +12,7 @@ This is currently a work in progress
 
 @author: Ryan Goetz, ryan.m.goetz@gmail.com
 
-last update: April 5, 2020 
+last update: April 6, 2020 
 """
 
 def rando(mod=9,sleep=False):

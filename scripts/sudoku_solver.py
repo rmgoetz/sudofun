@@ -625,10 +625,11 @@ trialsC = 0
 
 
 # if the puzzle isn't solved, test each choice and remove ones that lead to a contradiction
-''' I would like to implement this with a function, but when the for loop is
-    placed inside a function the deepcopy of P does not appear to work properly.
-    More thought needs to be put into this; at the moment, the loop tests the 
-    removal of every single bit, whereas the puzzle might be solvable by 
+''' In the sudofun package, sudofun.solver() replaces the functionality of this
+    loop (and some stuff before it).
+    
+    More thought needs to be put into this process; at the moment, the loop tests 
+    the removal of every single bit, whereas the puzzle might be solvable by 
     reduceloop() after only a few iterations of the for loop below (this was the
     idea behind the leastpopular function).
     
