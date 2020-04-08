@@ -83,7 +83,7 @@ def solve(cluestring,**kwargs):
     verbose  = kwargs.pop('verbose',None)
     binform  = kwargs.pop('binform',None)
     output   = kwargs.pop('output',None)
-    seek_num = kwargs.pop('seek_num',None) 
+    seek_num = kwargs.pop('seek_num',1) 
     
     # handle the keyword arguments
     if timer is None:
@@ -106,7 +106,7 @@ def solve(cluestring,**kwargs):
         timer = True
         loops = True
     else:
-        time = False
+        timer = False
         loops = False
         
     if binform is None:
@@ -119,16 +119,16 @@ def solve(cluestring,**kwargs):
         pass
     elif output not in ['all','ALL','time','TIME','puzzle','PUZZLE']:
         print('output argument not recognized; therefore ignored')
+        
+    if not isinstance(seek_num,int):
+        print('seek_num argument not given as an int; therefore set to 1')
+        seek_num = 1
     
+    
+    # handle the input clue
     if not isinstance(cluestring,str):
         raise Exception('Clue must be formatted as a string')
-        
-    if seek_num is None:
-        pass
-    elif not isinstance(seek_num,int):
-        print('seek_num argument not given as an int; therefore ignored')
-        seek_num = None
-    
+          
     # initiallize the puzzle
     P = init_puzzle()
     
