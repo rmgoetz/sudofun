@@ -12,7 +12,7 @@ puzzle that is not fully determined.
 
 @author: Ryan Goetz, ryan.m.goetz@gmail.com
 
-last update: April 5, 2020 
+last update: April 8, 2020 
 """
 '''
 Table of Contents:
@@ -23,48 +23,48 @@ Table of Contents:
     
     Reduction Functions:
         
-        strike -------------------------------- Line 187
+        strike -------------------------------- Line 212
         
-        unique -------------------------------- Line 227
+        unique -------------------------------- Line 252
         
-        squeeze ------------------------------- Line 281
+        squeeze ------------------------------- Line 306
         
-        pipe ---------------------------------- Line 379
+        pipe ---------------------------------- Line 404
         
-        pigeon -------------------------------- Line 476
+        pigeon -------------------------------- Line 501
         
-        reduceloop ---------------------------- Line 532
+        reduceloop ---------------------------- Line 557
         
-        seek_and_destroy ---------------------- Line 570
+        seek_and_destroy ---------------------- Line 595
         
         
     Auxiliary Functions:
         
-        countbits ----------------------------- Line 606
+        countbits ----------------------------- Line 658
         
-        listdiff ------------------------------ Line 626
+        listdiff ------------------------------ Line 678
         
-        init_puzzle --------------------------- Line 642
+        init_puzzle --------------------------- Line 694
         
-        puzzlecopy ---------------------------- Line 672
+        puzzlecopy ---------------------------- Line 724
         
-        checkstatus --------------------------- Line 689
+        checkstatus --------------------------- Line 741
         
-        translate_clues ----------------------- Line 708
+        translate_clues ----------------------- Line 760
         
-        leastpopular -------------------------- Line 757
+        leastpopular -------------------------- Line 809
         
         
     Print Functions:
         
-        fancyprint ---------------------------- Line 784
+        fancyprint ---------------------------- Line 836
         
-        fanciestprint ------------------------- Line 805
+        fanciestprint ------------------------- Line 857
         
-        ugliestprint -------------------------- Line 834
+        ugliestprint -------------------------- Line 886
         
   
-Last line check: April 5, 2020
+Last line check: April 8, 2020
 '''
 
 
@@ -78,29 +78,30 @@ rng81 = [x for x in range(81)]
 #-----------------------------------------------------------------------------
 def solve(cluestring,**kwargs):
     
-    timer   = kwargs.pop('timer',None)
-    loops   = kwargs.pop('loops',None)  
-    verbose = kwargs.pop('verbose',None)
-    binform = kwargs.pop('binform',None)
-    output  = kwargs.pop('output',None)
+    timer    = kwargs.pop('timer',None)
+    loops    = kwargs.pop('loops',None)  
+    verbose  = kwargs.pop('verbose',None)
+    binform  = kwargs.pop('binform',None)
+    output   = kwargs.pop('output',None)
+    seek_num = kwargs.pop('seek_num',None) 
     
     # handle the keyword arguments
     if timer is None:
         timer = False
     elif not isinstance(timer,bool):
-        print('timer argument not specified as Boolean; thereby defaulted to False')
+        print('timer argument not specified as Boolean; therefore defaulted to False')
         timer = False
         
     if loops is None:
         loops = False
     elif not isinstance(loops,bool):
-        print('loops argument not specified as Boolean; thereby defaulted to False')
+        print('loops argument not specified as Boolean; therefore defaulted to False')
         loops = False
         
     if verbose is None:
         pass
     elif not isinstance(verbose,bool):
-        print('verbose argument not specified as Boolean; thereby ignored')
+        print('verbose argument not specified as Boolean; therefore ignored')
     elif verbose is True:
         timer = True
         loops = True
@@ -111,16 +112,22 @@ def solve(cluestring,**kwargs):
     if binform is None:
         binform = False
     elif not isinstance(binform,bool):
-        print('binform argument not specified as Boolean; thereby defaulted to False')
+        print('binform argument not specified as Boolean; therefore defaulted to False')
         binform = False
         
     if output is None:
         pass
     elif output not in ['all','ALL','time','TIME','puzzle','PUZZLE']:
-        print('output argument not recognized; thereby ignored')
+        print('output argument not recognized; therefore ignored')
     
     if not isinstance(cluestring,str):
         raise Exception('Clue must be formatted as a string')
+        
+    if seek_num is None:
+        pass
+    elif not isinstance(seek_num,int):
+        print('seek_num argument not given as an int; therefore ignored')
+        seek_num = None
     
     # initiallize the puzzle
     P = init_puzzle()
@@ -163,7 +170,7 @@ def solve(cluestring,**kwargs):
     
     if len(Q) != 0:
         # try out things and eliminate options that fail
-        P,S,Q, trialsB = seek_and_destroy(P,S,Q)
+        P,S,Q, trialsB = seek_and_destroy(P,S,Q,seek_num=seek_num)
     
         # run reduction loop again
         P,S,Q, trialsC = reduceloop(P,S,Q)
@@ -585,23 +592,50 @@ def reduceloop(PP,SS,QQ,goodcheck=False):
 #
 # 
 #-----------------------------------------------------------------------------
-def seek_and_destroy(PP,SS,QQ):
-    trials = 0
-    what_next = leastpopular(PP,QQ)
-    for nxt in range(len(what_next)):
-        test_bit   = 1<<what_next[nxt][1]
-        test_spots = what_next[nxt][2]
-        for q in test_spots:
-            dum_P = puzzlecopy(PP)
-            dum_S = SS[:]
-            dum_Q = QQ[:]
-            dum_P[q][0] = test_bit
-            dum_S.append(q) # evidently unnecessary, but I'm not exactly sure why, so it stays for now
-            dum_Q.remove(q) # ditto
-            dum_P,dum_S,dum_Q,tries,alive = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
-            trials += tries
-            if not alive:
-                PP[q][0] = PP[q][0] - (PP[q][0] & test_bit)
+def seek_and_destroy(PP,SS,QQ,seek_num=None):
+    
+    if seek_num is None:
+        trials = 0
+        what_next = leastpopular(PP,QQ)
+        for nxt in range(len(what_next)):
+            test_bit   = 1<<what_next[nxt][1]
+            test_spots = what_next[nxt][2]
+            for q in test_spots:
+                dum_P = puzzlecopy(PP)
+                dum_S = SS[:]
+                dum_Q = QQ[:]
+                dum_P[q][0] = test_bit
+                dum_S.append(q) # evidently unnecessary, but I'm not exactly sure why, so it stays for now
+                dum_Q.remove(q) # ditto
+                dum_P,dum_S,dum_Q,tries,alive = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
+                trials += tries
+                if not alive:
+                    PP[q][0] = PP[q][0] - (PP[q][0] & test_bit)
+    else:
+        trials = 0
+        what_next = leastpopular(PP,QQ)
+        seek_cnt = 0
+        for nxt in range(len(what_next)):
+            test_bit   = 1<<what_next[nxt][1]
+            test_spots = what_next[nxt][2]
+            for q in test_spots:
+                dum_P = puzzlecopy(PP)
+                dum_S = SS[:]
+                dum_Q = QQ[:]
+                dum_P[q][0] = test_bit
+                dum_S.append(q) # evidently unnecessary, but I'm not exactly sure why, so it stays for now
+                dum_Q.remove(q) # ditto
+                dum_P,dum_S,dum_Q,tries,alive = reduceloop(dum_P,dum_S,dum_Q,goodcheck=True)
+                trials += tries
+                if not alive:
+                    PP[q][0] = PP[q][0] - (PP[q][0] & test_bit)
+                    seek_cnt +=1
+                if seek_cnt >= seek_num:
+                    break
+            else:
+                continue
+            break
+        
             
     # update the list of unsolved indices (also evidently unnecessary)
     newS = []
