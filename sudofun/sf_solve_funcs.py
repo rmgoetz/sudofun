@@ -78,36 +78,16 @@ rng81 = [x for x in range(81)]
 #-----------------------------------------------------------------------------
 def solve(cluestring,**kwargs):
     
-    timer    = kwargs.pop('timer',None)
-    loops    = kwargs.pop('loops',None)  
     verbose  = kwargs.pop('verbose',None)
     binform  = kwargs.pop('binform',None)
     output   = kwargs.pop('output',None)
     seek_num = kwargs.pop('seek_num',1) 
     
     # handle the keyword arguments
-    if timer is None:
-        timer = False
-    elif not isinstance(timer,bool):
-        print('timer argument not specified as Boolean; therefore defaulted to False')
-        timer = False
-        
-    if loops is None:
-        loops = False
-    elif not isinstance(loops,bool):
-        print('loops argument not specified as Boolean; therefore defaulted to False')
-        loops = False
-        
     if verbose is None:
         pass
     elif not isinstance(verbose,bool):
         print('verbose argument not specified as Boolean; therefore ignored')
-    elif verbose is True:
-        timer = True
-        loops = True
-    else:
-        timer = False
-        loops = False
         
     if binform is None:
         binform = False
@@ -117,7 +97,7 @@ def solve(cluestring,**kwargs):
         
     if output is None:
         pass
-    elif output not in ['all','ALL','time','TIME','puzzle','PUZZLE']:
+    elif output not in ['all','ALL','time','TIME','loops','LOOPS','puzzle','PUZZLE']:
         print('output argument not recognized; therefore ignored')
         
     if not isinstance(seek_num,int):
@@ -159,8 +139,7 @@ def solve(cluestring,**kwargs):
             fanciestprint([p[0] for p in P])
         print('\n')
 
-    if timer:
-        start_time = time.time()
+    start_time = time.time()
 
     # do reductions until no further solving is done
     P,S,Q,trialsA = reduceloop(P,S,Q)
@@ -168,24 +147,27 @@ def solve(cluestring,**kwargs):
     trialsB = 0
     trialsC = 0
     
-    if len(Q) != 0:
+    loop_cnt = 0
+    while len(Q) != 0:
         # try out things and eliminate options that fail
         P,S,Q, trialsB = seek_and_destroy(P,S,Q,seek_num=seek_num)
     
         # run reduction loop again
         P,S,Q, trialsC = reduceloop(P,S,Q)
+        
+        loop_cnt +=1
+        if loop_cnt >= 100:
+            print('Loop reduction limit reached')
+            break
 
-    if timer:
-        end_time = time.time()
-        print('\nCalculation time: ',end_time-start_time,'s')
-    
-    if loops:
-        print('Reduction loops: ',trialsA+trialsB+trialsC)
+    end_time = time.time()
 
     simpleP = [p[0] for p in P]
     
     # print the solved puzzle
     if verbose:
+        print('\nCalculation time: ',end_time-start_time,'s')
+        print('Reduction loops: ',trialsA+trialsB+trialsC)
         print('\nSolved Puzzle:')
     if verbose is not False:
         if binform:
@@ -195,11 +177,13 @@ def solve(cluestring,**kwargs):
     
     # return outputs if desired
     if output in ['all','ALL']:
-        return simpleP, end_time-start_time
+        return simpleP, end_time-start_time, trialsA+trialsB+trialsC
     elif output in ['puzzle','PUZZLE']:
         return simpleP
     elif output in ['time','TIMER']:
         return end_time-start_time
+    elif output in ['loops','LOOPS']:
+        return trialsA+trialsB+trialsC
 #-----------------------------------------------------------------------------
 #
 #  
