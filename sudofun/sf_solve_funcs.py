@@ -82,6 +82,7 @@ def solve(cluestring,**kwargs):
     loops   = kwargs.pop('loops',None)  
     verbose = kwargs.pop('verbose',None)
     binform = kwargs.pop('binform',None)
+    output  = kwargs.pop('output',None)
     
     # handle the keyword arguments
     if timer is None:
@@ -103,6 +104,9 @@ def solve(cluestring,**kwargs):
     elif verbose is True:
         timer = True
         loops = True
+    else:
+        time = False
+        loops = False
         
     if binform is None:
         binform = False
@@ -110,6 +114,10 @@ def solve(cluestring,**kwargs):
         print('binform argument not specified as Boolean; thereby defaulted to False')
         binform = False
         
+    if output is None:
+        pass
+    elif output not in ['all','ALL','time','TIME','puzzle','PUZZLE']:
+        print('output argument not recognized; thereby ignored')
     
     if not isinstance(cluestring,str):
         raise Exception('Clue must be formatted as a string')
@@ -167,14 +175,24 @@ def solve(cluestring,**kwargs):
     if loops:
         print('Reduction loops: ',trialsA+trialsB+trialsC)
 
+    simpleP = [p[0] for p in P]
     
     # print the solved puzzle
     if verbose:
         print('\nSolved Puzzle:')
-    if binform:
-        ugliestprint([p[0] for p in P])
-    else:
-        fanciestprint([p[0] for p in P]) 
+    if verbose is not False:
+        if binform:
+            ugliestprint(simpleP)
+        else:
+            fanciestprint(simpleP) 
+    
+    # return outputs if desired
+    if output in ['all','ALL']:
+        return simpleP, end_time-start_time
+    elif output in ['puzzle','PUZZLE']:
+        return simpleP
+    elif output in ['time','TIMER']:
+        return end_time-start_time
 #-----------------------------------------------------------------------------
 #
 #  
