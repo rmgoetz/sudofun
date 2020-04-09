@@ -635,7 +635,8 @@ trialsC = 0
     
     This is obviously the part of the code that can be sped up the most.
     '''
-if len(Q) != 0:
+loop_cnt = 0
+while len(Q) != 0:
     what_next = leastpopular(P,Q)
     for nxt in range(len(what_next)):
         test_bit   = 1<<what_next[nxt][1]
@@ -651,6 +652,10 @@ if len(Q) != 0:
             trialsB += tries
             if not alive:
                 P[q][0] = P[q][0] - (P[q][0] & test_bit)
+                break
+        else:
+            continue
+        break
             
     # update the list of unsolved indices (also evidently unnecessary)
     newS = []
@@ -661,7 +666,13 @@ if len(Q) != 0:
     Q = listdiff(Q,S)
     
     # run reduction loop again
-    P,S,Q, trialsC = reduceloop(P,S,Q)
+    P,S,Q, newtrials = reduceloop(P,S,Q)
+    trialsC += newtrials
+    
+    loop_cnt +=1
+    if loop_cnt >= 100:
+        break
+        print('Loop limit reached')
 
 end_time = time.time()
 print('\nCalculation time: ',end_time-start_time,'s')

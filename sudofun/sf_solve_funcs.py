@@ -150,14 +150,16 @@ def solve(cluestring,**kwargs):
     loop_cnt = 0
     while len(Q) != 0:
         # try out things and eliminate options that fail
-        P,S,Q, trialsB = seek_and_destroy(P,S,Q,seek_num=seek_num)
+        P,S,Q, newtrials = seek_and_destroy(P,S,Q,seek_num=seek_num)
+        trialsB += newtrials
     
         # run reduction loop again
-        P,S,Q, trialsC = reduceloop(P,S,Q)
+        P,S,Q, newtrials = reduceloop(P,S,Q)
+        trialsC += newtrials
         
         loop_cnt +=1
         if loop_cnt >= 100:
-            print('Loop reduction limit reached')
+            print('Loop limit reached')
             break
 
     end_time = time.time()
