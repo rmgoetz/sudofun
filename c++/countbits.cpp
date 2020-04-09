@@ -15,10 +15,7 @@ int main()
 	num = (num & 271) + ((num & 240) >> 4);
 	num = (num & 127) + ((num & 256) >> 8);
 
-	cout << n;
-	cout << " has ";
-	cout << num;
-	cout << " nonzero bits";
+	cout << n << " has " << num << " nonzero bits";
 
 	return 0;
 }
