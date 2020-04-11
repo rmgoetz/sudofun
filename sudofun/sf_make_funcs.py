@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sudofun
 import time
+from sudofun.sf_solve_funcs import *
 
 """
 Created on Sun Apr  5 17:18:51 2020
@@ -12,8 +13,16 @@ This is currently a work in progress
 
 @author: Ryan Goetz, ryan.m.goetz@gmail.com
 
-last update: April 6, 2020 
+last update: April 10, 2020 
 """
+
+def build(**kwargs):
+    
+    clue = kwargs.pop('clue',None)
+    difficulty = kwargs.pop('difficulty',None)
+    
+    
+
 
 def rando(mod=9,sleep=False):
     '''

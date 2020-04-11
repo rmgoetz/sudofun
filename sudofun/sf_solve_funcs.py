@@ -12,13 +12,15 @@ puzzle that is not fully determined.
 
 @author: Ryan Goetz, ryan.m.goetz@gmail.com
 
-last update: April 8, 2020 
+last update: April 10, 2020 
 """
 '''
 Table of Contents:
     Foreground Functions:
         
         solve --------------------------------- Line 79
+        
+        convert ------------------------------- Line
         
     
     Reduction Functions:
@@ -189,6 +191,45 @@ def solve(cluestring,**kwargs):
 #-----------------------------------------------------------------------------
 #
 #  
+
+
+
+#
+# 
+#-----------------------------------------------------------------------------
+def convert(clue):
+    '''
+    The convert function:
+        Takes a string of the standard clue form and converts it to proper
+        sudofun form.
+    '''
+    
+    if not isinstance(clue,str):
+        raise Exception("Clue must be given in string form")
+    elif len(clue) != 81:
+        raise Exception("Clue length does not match expected length of 81")
+    
+    try:
+        cloo = clue+''
+        translation = ''
+        k = 0
+        while len(cloo) > 0:
+            if cloo[0] != '0':
+                i = k // 9
+                j = k % 9
+                newform = str(i+1)+str(j+1)+cloo[0]+':'
+                translation += newform
+            cloo = cloo[1:]
+            k += 1
+        translation = translation[:-1]
+        
+        return translation
+
+    except:
+        raise Exception("Unsupported character in clue string")
+#-----------------------------------------------------------------------------
+#
+#
 
 
 
