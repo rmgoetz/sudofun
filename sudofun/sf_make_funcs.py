@@ -28,6 +28,7 @@ def build(**kwargs):
     
     clue = kwargs.pop('clue',None)
     difficulty = kwargs.pop('difficulty',None)
+    output= kwargs.pop('output',None)
     
     # initiate the puzzle
     P = init_puzzle() 
@@ -82,3 +83,6 @@ def rando(mod=9,sleep=False):
     f = (b<<(e % 3))*(c<<(b % 5))*(d<<(c % 7))*(e<<(d % 11))
     g = int(str(f)[:4])
     return (g % mod)+1
+#-----------------------------------------------------------------------------
+#
+# 

@@ -149,20 +149,16 @@ def solve(cluestring,**kwargs):
     trialsB = 0
     trialsC = 0
     
-    loop_cnt = 0
-    while len(Q) != 0:
+    foundflag = len(Q) != 0
+    while found_flag:
         # try out things and eliminate options that fail
-        P,S,Q, newtrials = seek_and_destroy(P,S,Q,seek_num=seek_num)
+        P,S,Q, newtrials, found_flag = seek_and_destroy(P,S,Q,seek_num=seek_num)
         trialsB += newtrials
     
         # run reduction loop again
         P,S,Q, newtrials = reduceloop(P,S,Q)
         trialsC += newtrials
         
-        loop_cnt +=1
-        if loop_cnt >= 100:
-            print('Loop limit reached')
-            break
 
     end_time = time.time()
 
@@ -210,7 +206,7 @@ def convert(clue):
         raise Exception("Clue length does not match expected length of 81")
     
     try:
-        cloo = clue+''
+        cloo = clue
         translation = ''
         k = 0
         while len(cloo) > 0:
@@ -590,7 +586,7 @@ def reduceloop(PP,SS,QQ,goodcheck=False):
     trials = 0
     keep_going = True
     while keep_going:
-        old_P = [q[0] for q in PP]
+        old_P = [p[0] for p in PP]
         PP,SS,QQ = strike(PP,SS,QQ)
         PP,SS,QQ = unique(PP,SS,QQ)
         PP,SS,QQ = strike(PP,SS,QQ)
@@ -599,7 +595,7 @@ def reduceloop(PP,SS,QQ,goodcheck=False):
         #PP,SS,QQ = pigeon(PP,SS,QQ)
         PP,SS,QQ = strike(PP,SS,QQ)
         PP,SS,QQ = pipe(PP,SS,QQ)
-        new_P = [q[0] for q in PP]
+        new_P = [p[0] for p in PP]
         keep_going = not (old_P == new_P)
         trials += 1
         if goodcheck:
@@ -622,8 +618,10 @@ def reduceloop(PP,SS,QQ,goodcheck=False):
 def seek_and_destroy(PP,SS,QQ,seek_num=None):
     
     if seek_num is None:
-        trials = 0
+        trials    = 0
+        found_cnt = 0
         what_next = leastpopular(PP,QQ)
+
         for nxt in range(len(what_next)):
             test_bit   = 1<<what_next[nxt][1]
             test_spots = what_next[nxt][2]
@@ -638,10 +636,11 @@ def seek_and_destroy(PP,SS,QQ,seek_num=None):
                 trials += tries
                 if not alive:
                     PP[q][0] = PP[q][0] - (PP[q][0] & test_bit)
+                    found_cnt += 1
     else:
-        trials = 0
+        trials    = 0
+        found_cnt = 0
         what_next = leastpopular(PP,QQ)
-        seek_cnt = 0
         for nxt in range(len(what_next)):
             test_bit   = 1<<what_next[nxt][1]
             test_spots = what_next[nxt][2]
@@ -656,8 +655,8 @@ def seek_and_destroy(PP,SS,QQ,seek_num=None):
                 trials += tries
                 if not alive:
                     PP[q][0] = PP[q][0] - (PP[q][0] & test_bit)
-                    seek_cnt +=1
-                if seek_cnt >= seek_num:
+                    found_cnt += 1
+                if found_cnt >= seek_num:
                     break
             else:
                 continue
@@ -672,7 +671,12 @@ def seek_and_destroy(PP,SS,QQ,seek_num=None):
     SS = newS
     QQ = listdiff(QQ,SS)
     
-    return PP,SS,QQ,trials
+    if found_cnt >= 1:
+        foundflag = True
+    else:
+        foundflag = False
+    
+    return PP,SS,QQ,trials,foundflag
 #-----------------------------------------------------------------------------
 #
 #  
