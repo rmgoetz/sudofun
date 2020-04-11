@@ -16,14 +16,55 @@ This is currently a work in progress
 last update: April 10, 2020 
 """
 
+# define some useful index ranges as lists
+rng9  = [x for x in range(9)]
+rng81 = [x for x in range(81)]
+
+
+#
+# 
+#-----------------------------------------------------------------------------
 def build(**kwargs):
     
     clue = kwargs.pop('clue',None)
     difficulty = kwargs.pop('difficulty',None)
     
+    # initiate the puzzle
+    P = init_puzzle() 
     
+    # handle case when a seed clue is provided
+    if isinstance(clue,str):
+        clue_Q = True
+        clue_len,init_i,init_j,init_p = translate_clues(clue)
+        
+        # populate the puzzle
+        for c in range(clue_len):
+            i = init_i[c]
+            j = init_j[c]
+            p = init_p[c]
+            P[9*i+j][0] = p
+        
+        # make another puzzle that is as solved as possible
+        PSOL = solve(clue,verbose=False,output='puzzle')
+    else:
+        # build the solved index list S
+        S = []
+        for k in rng81:
+            if countbits(P[k][0]) == 1:
+                S.append(k)
+        
+        # define the unsolved index list Q
+        Q = listdiff(rng81,S)
+    
+#-----------------------------------------------------------------------------
+#
+# 
 
 
+
+#
+# 
+#-----------------------------------------------------------------------------
 def rando(mod=9,sleep=False):
     '''
     A quick function for generating psuedo-random numbers. A work in progress.
