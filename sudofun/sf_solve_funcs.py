@@ -150,14 +150,17 @@ def solve(cluestring,**kwargs):
     trialsC = 0
     
     foundflag = len(Q) != 0
-    while found_flag:
+    while foundflag:
         # try out things and eliminate options that fail
-        P,S,Q, newtrials, found_flag = seek_and_destroy(P,S,Q,seek_num=seek_num)
+        P,S,Q, newtrials, foundflag = seek_and_destroy(P,S,Q,seek_num=seek_num) 
         trialsB += newtrials
     
         # run reduction loop again
         P,S,Q, newtrials = reduceloop(P,S,Q)
         trialsC += newtrials
+        
+        # check if the puzzle is solved
+        foundflag &= len(Q) != 0
         
 
     end_time = time.time()
@@ -210,7 +213,7 @@ def convert(clue):
         translation = ''
         k = 0
         while len(cloo) > 0:
-            if cloo[0] != '0':
+            if cloo[0] != '0' and '.':
                 i = k // 9
                 j = k % 9
                 newform = str(i+1)+str(j+1)+cloo[0]+':'
@@ -621,7 +624,6 @@ def seek_and_destroy(PP,SS,QQ,seek_num=None):
         trials    = 0
         found_cnt = 0
         what_next = leastpopular(PP,QQ)
-
         for nxt in range(len(what_next)):
             test_bit   = 1<<what_next[nxt][1]
             test_spots = what_next[nxt][2]
@@ -842,7 +844,8 @@ def leastpopular(PP,QQ):
     The least popular function:
         Find the bit which shows up least often amongst the unsolved puzzle 
         entries. Return the multiplicity, bit, as well as the indices where it 
-        occurs in the puzzle.
+        occurs in the puzzle. NOTE THAT THE PUZZLE MUST BE UNSOLVED, OR THE
+        WHILE LOOP WILL ULTIMATELY THROW OUT AN INDEX ERROR.
     '''
     tracker = [[0,n,[]] for n in rng9]
     for bit in rng9:

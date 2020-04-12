@@ -86,3 +86,42 @@ def rando(mod=9,sleep=False):
 #-----------------------------------------------------------------------------
 #
 # 
+
+
+
+#
+# 
+#-----------------------------------------------------------------------------
+def translate_puzzle(PP):
+    '''
+    The translate puzzle function:
+        Takes a full-form puzzle and converts it into a clue string.
+    '''
+    clue = ''
+    for k in rng81:
+        p = P[k][0]
+        if countbits(p) == 1:
+            i = k // 9
+            j = k % 9
+            newclue = str(i+1)+str(j+1)+str(p)+':'
+            clue += newclue
+    clue = clue[:-1]
+    return clue    
+#-----------------------------------------------------------------------------
+#
+# 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
