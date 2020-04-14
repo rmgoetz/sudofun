@@ -20,7 +20,7 @@ last update: April 10, 2020
 rng9  = [x for x in range(9)]
 rng81 = [x for x in range(81)]
 
-'''
+
 #
 # 
 #-----------------------------------------------------------------------------
@@ -47,6 +47,8 @@ def build(**kwargs):
         
         # make another puzzle that is as solved as possible
         PSOL = solve(clue,verbose=False,output='puzzle')
+    
+    # handle the case with no clue seed
     else:
         # build the solved index list S
         S = []
@@ -56,11 +58,23 @@ def build(**kwargs):
         
         # define the unsolved index list Q
         Q = listdiff(rng81,S)
+        
+        PSOL = puzzlecopy(P)
+        PSOL = [p[0] for p in P]
+        
+    # One idea for difficulty options: a measure of the redundancy of a clue
+    # should be established. Easier difficulty puzzles could be built with 
+    # clues that are, on average, less redundant. This is a far-future project.
+    
+    
+    
+    
+    
     
 #-----------------------------------------------------------------------------
 #
 # 
-'''
+
 
 
 #

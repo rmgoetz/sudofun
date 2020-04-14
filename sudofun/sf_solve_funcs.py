@@ -56,6 +56,8 @@ Table of Contents:
         
         leastpopular -------------------------- Line 809
         
+        aux_solve_from_puzzle ----------------- Line
+        
         
     Print Functions:
         
@@ -858,6 +860,51 @@ def leastpopular(PP,QQ):
     while tracked[0][0] == 0:
         tracked = tracked[1:]
     return tracked
+#-----------------------------------------------------------------------------
+#
+#
+
+
+
+#
+# 
+#-----------------------------------------------------------------------------
+def aux_solve_from_puzzle(PP):
+    '''
+    The auxiliary solver function:
+        Takes a puzzle and returns the maximally solved puzzle. Disctict from 
+        solve in that its argument is a puzzle, not a clue string, it does not
+        print any outputs, and there are no optional arguments. Intended to be
+        used within the build function.
+    
+    '''
+    
+    P = puzzlecopy(PP)
+    
+    # build the solved index list S
+    S = []
+    for k in rng81:
+        if countbits(P[k][0]) == 1:
+            S.append(k)
+        
+    # define the unsolved index list Q
+    Q = listdiff(rng81,S)
+
+    # do reductions until no further solving is done
+    P,S,Q,discard = reduceloop(P,S,Q)
+    
+    foundflag = len(Q) != 0
+    while foundflag:
+        # try out things and eliminate options that fail
+        P,S,Q, discard, foundflag = seek_and_destroy(P,S,Q,seek_num=seek_num) 
+    
+        # run reduction loop again
+        P,S,Q, discard = reduceloop(P,S,Q)
+        
+        # check if the puzzle is solved
+        foundflag &= len(Q) != 0
+        
+    return P,S,Q # do I want S and Q or is P enough?
 #-----------------------------------------------------------------------------
 #
 #
