@@ -240,7 +240,7 @@ def convert(clue):
 def strike(PP,SS,QQ):
     '''
     The strike reduction function:
-        For every solved element, remove the solved bit from each of it's row,
+        For every solved element, remove the solved bit from each of its row,
         column, and grid partners.
     Strike should always preceed an iteration of any other reduction function.
     '''
@@ -872,7 +872,7 @@ def leastpopular(PP,QQ):
 def aux_solve_from_puzzle(PP):
     '''
     The auxiliary solver function:
-        Takes a puzzle and returns the maximally solved puzzle. Disctict from 
+        Takes a puzzle and returns the maximally solved puzzle. Distinct from 
         solve in that its argument is a puzzle, not a clue string, it does not
         print any outputs, and there are no optional arguments. Intended to be
         used within the build function.
