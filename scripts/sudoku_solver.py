@@ -461,9 +461,10 @@ def fanciestprint(X):
                 Y[index] = cnt
             else:
                 Y[index] = 0
-        print(Y[:3],'|',Y[3:6],'|',Y[6:9])
+        # print(Y[:3],'|',Y[3:6],'|',Y[6:9])
+        print(f'  {Y[0]} {Y[1]} {Y[2]} | {Y[3]} {Y[4]} {Y[5]} | {Y[6]} {Y[7]} {Y[8]}')
         if 0<row and row<8 and (row % 3) == 2:
-            print('---------------------------------')
+            print(' -----------------------')
             
             
 def ugliestprint(X):
@@ -528,19 +529,19 @@ for k in rng81:
 
 print('''
       
----------------------------------------------------------------------------------
-Clues should be given to solver in the following form:\n
-      ijv\n
-where i is the row of the clue (1-9), j is the column (1-9), and v is the value. 
-Separate clues using colons, for example the following:\n
-      235:941:628\n
-signifies three clues: the 2nd row, 3rd column is 5, the 9th row, 4th column is 1,
-and the 6th row, 2nd column is 8.
----------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+ Clues should be given to solver in the following form:\n
+       ijv\n
+ where i is the row of the clue (1-9), j is the column (1-9), and v is the value. 
+ Separate clues using colons, for example the following:\n
+       235:941:628\n
+ signifies three clues: the 2nd row, 3rd column is 5, the 9th row, 4th column is 1,
+ and the 6th row, 2nd column is 8.
+------------------------------------------------------------------------------------
       ''') 
 
 # get input from user
-innie = input('Please enter clues in the format as prompted above: ')
+innie = input(' Please enter clues in the format as prompted above: ')
 
 # initialize the solved cells and define acceptable inputs
 init_solved_i = []
@@ -675,8 +676,8 @@ while len(Q) != 0:
         print('Loop limit reached')
 
 end_time = time.perf_counter()
-print('\nCalculation time: ',end_time-start_time,'s')
-print('Reduction loops: ',trialsA+trialsB+trialsC)
+print('\n Calculation time: ',end_time-start_time,'s')
+print(' Reduction loops: ',trialsA+trialsB+trialsC)
     
 #-----------------------------------------------------------------------------
 #
