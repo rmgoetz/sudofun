@@ -615,7 +615,7 @@ Q = listdiff(rng81,S)
 # PERFORM REDUCTION ON PUZZLE
 #-----------------------------------------------------------------------------
 
-start_time = time.time()
+start_time = time.perf_counter()
 
 # do reductions until no further solving is done
 P,S,Q,trialsA = reduceloop(P,S,Q)
@@ -674,7 +674,7 @@ while len(Q) != 0:
         break
         print('Loop limit reached')
 
-end_time = time.time()
+end_time = time.perf_counter()
 print('\nCalculation time: ',end_time-start_time,'s')
 print('Reduction loops: ',trialsA+trialsB+trialsC)
     

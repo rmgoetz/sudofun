@@ -143,7 +143,7 @@ def solve(cluestring,**kwargs):
             fanciestprint([p[0] for p in P])
         print('\n')
 
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     # do reductions until no further solving is done
     P,S,Q,trialsA = reduceloop(P,S,Q)
@@ -165,7 +165,7 @@ def solve(cluestring,**kwargs):
         foundflag &= len(Q) != 0
         
 
-    end_time = time.time()
+    end_time = time.perf_counter()
 
     simpleP = [p[0] for p in P]
     
