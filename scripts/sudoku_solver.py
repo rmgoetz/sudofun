@@ -452,7 +452,7 @@ def fanciestprint(X):
     print('\n')
     for row in rng9:
         Y = X[9*row:9*row+9]
-        for index,y in enumerate(Y):
+        for index, y in enumerate(Y):
             if countbits(y) == 1:
                 cnt = 0
                 while y > 0:
