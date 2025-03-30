@@ -4,8 +4,10 @@
 
 #include <string>
 #include <iterator>
-#include <tuple>
+// #include <tuple>
 #include <stdexcept>
+#include <memory>
+#include <set>
 
 class Iterator3
 {
@@ -71,17 +73,44 @@ private:
 public:
     Clue(const std::string &clueString)
     {
-        if (validateString(clueString))
-        {
-            this->clueString = clueString;
-        }
-        else
+        this->clueString = validateString(clueString);
+    }
+
+    std::string validateString(std::string clueString)
+    {
+
+        std::string return_string;
+        int str_len = clueString.length();
+
+        std::set<char> charSet = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        // The first validity check is just that we have the correct length
+        if ((str_len + 1) % 4 != 0)
         {
             throw std::invalid_argument("Clue string is improperly formatted");
         }
-    }
 
-    bool validateString(std::string clueString);
+        for (int i = 0; i < str_len; ++i)
+        {
+            char c = clueString[i];
+
+            // Index values that are multiples of three should be colon separators
+            if ((i % 3 == 0) && (c != ':'))
+            {
+                throw std::invalid_argument("Clue string is improperly formatted");
+            }
+            else if (charSet.find(c) != charSet.end())
+            {
+                return_string.append(1, c);
+            }
+            else
+            {
+                throw std::invalid_argument("Clue string is improperly formatted");
+            }
+        }
+
+        return return_string;
+    }
 
     Iterator3 begin() { return Iterator3(clueString.begin()); }
     Iterator3 end() { return Iterator3(clueString.end()); }
