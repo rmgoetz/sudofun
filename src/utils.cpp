@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 #include <string>
+#include <stdexcept>
 
 namespace utils
 {
@@ -17,8 +18,18 @@ namespace utils
 		return num;
 	}
 
+	/**
+	 * @brief Converts a sudoku cell value to its associated 9 bit value, given by 2**(val - 1)
+	 *
+	 * @param val - An integer value from 1 to 9 inclusive.
+	 * @return uint16_t
+	 */
 	uint16_t valueToNineBit(uint8_t val)
 	{
+		if ((val < 1) && (val > 9))
+		{
+			throw std::invalid_argument("Input must be in the range 1-9");
+		}
 		std::string binary_string = "000000000";
 		binary_string[9 - val] = '1';
 		return static_cast<uint16_t>(std::stoi(binary_string, nullptr, 2));
