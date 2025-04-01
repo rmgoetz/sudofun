@@ -3,6 +3,7 @@
 #include "utils.hpp"
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 namespace utils
 {
@@ -30,8 +31,10 @@ namespace utils
 		{
 			throw std::invalid_argument("Input must be in the range 1-9");
 		}
+
 		std::string binary_string = "000000000";
-		binary_string[9 - val] = '1';
+		binary_string.replace(9 - val, 1, "1");
+
 		return static_cast<uint16_t>(std::stoi(binary_string, nullptr, 2));
 	}
 } // namespace utils

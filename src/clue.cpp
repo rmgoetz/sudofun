@@ -1,5 +1,6 @@
 
 #include "clue.hpp"
+#include <iostream>
 
 std::string Clue::validateString(std::string clueString)
 {
@@ -12,7 +13,7 @@ std::string Clue::validateString(std::string clueString)
     // The first validity check is just that we have the correct length
     if ((str_len + 1) % 4 != 0)
     {
-        throw std::invalid_argument("Clue string is improperly formatted");
+        throw std::invalid_argument("Clue string is improperly formatted: wrong length");
     }
 
     for (int i = 0; i < str_len; ++i)
@@ -20,9 +21,12 @@ std::string Clue::validateString(std::string clueString)
         char c = clueString[i];
 
         // Index values that are multiples of three should be colon separators
-        if ((i % 3 == 0) && (c != ':'))
+        if ((i + 1) % 4 == 0)
         {
-            throw std::invalid_argument("Clue string is improperly formatted");
+            if (c != ':')
+            {
+                throw std::invalid_argument("Clue string is improperly formatted: no colon delimiters");
+            }
         }
         else if (charSet.find(c) != charSet.end())
         {
@@ -30,7 +34,7 @@ std::string Clue::validateString(std::string clueString)
         }
         else
         {
-            throw std::invalid_argument("Clue string is improperly formatted");
+            throw std::invalid_argument("Clue string is improperly formatted: illegal characters");
         }
     }
 

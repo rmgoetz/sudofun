@@ -5,7 +5,7 @@
 #include <chrono>
 #include <string>
 
-int main()
+int Idontrememberwhatthiswassupposedtobe()
 {
     using namespace std::chrono;
 
@@ -32,5 +32,5 @@ int main()
 
     std::cout << (g % mod) + 1; // comment out when not standalone
 
-    return 0 //(g % mod) + 1;
+    return 0; //(g % mod) + 1;
 }
