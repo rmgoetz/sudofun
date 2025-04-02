@@ -26,8 +26,9 @@ int main()
     std::cin >> innie;
     std::cout << "The validated cluestring output: " << Clue::validateString(innie) << std::endl;
 
+    Clue clue = Clue(innie);
     Puzzle puzzle = Puzzle();
-    puzzle.addClueString(Clue(innie));
+    puzzle.addClueString(&clue);
 
     for (int i = 0; i < 81; ++i)
     {
