@@ -8,6 +8,12 @@
 namespace utils
 {
 
+	/**
+	 * @brief Counts the number of active/hot bits in a number less than or equal to 511.
+	 * 
+	 * @param n 
+	 * @return uint16_t The number of nonzero bits in the binary representation of the input
+	 */
 	uint16_t countBits(uint16_t n)
 	{
 		uint16_t num = n;

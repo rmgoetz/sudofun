@@ -75,7 +75,7 @@ public:
         this->clueString = validateString(clueString);
     }
 
-    std::string validateString(std::string clueString);
+    static std::string validateString(std::string clueString);
 
     Iterator3 begin() { return Iterator3(clueString.begin()); }
     Iterator3 end() { return Iterator3(clueString.end()); }
