@@ -2,6 +2,7 @@
 
 #include "clue.hpp"
 #include "puzzle.hpp"
+#include "solver.hpp"
 #include "utils.hpp"
 #include <iostream>
 #include <tuple>
@@ -29,20 +30,17 @@ int main()
     Clue clue = Clue(innie);
     Puzzle puzzle = Puzzle();
     puzzle.addClueString(&clue);
+    puzzle.printPuzzle();
 
-    for (int i = 0; i < 81; ++i)
-    {
+    std::cout << "\n\n" << std::endl;
 
-        std::cout << puzzle.getValue(i) << " ";
-        if ((i + 1) % 9 == 0)
-        {
-            std::cout << std::endl;
-        }
-        else
-        {
-            std::cout.flush();
-        }
-    }
+    Solver solver = Solver(&puzzle);
+    bool updated = false;
+    solver.strike(&updated);
+
+    puzzle.printPuzzle();
+
+
 
     return 0;
 }

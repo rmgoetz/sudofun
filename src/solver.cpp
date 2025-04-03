@@ -3,6 +3,47 @@
 
 void Solver::strike(bool *updated)
 {
+    bool is_done = false;
+
+    while (!is_done)
+    {
+        uint8_t initial_unsolved = this->puzzle->numUnsolved();
+
+        for (const uint8_t &solved_idx : this->puzzle->latest_solved_indices)
+        {
+            uint16_t puzzle_value = this->puzzle->getValue(solved_idx);
+
+            // Strike from row groups
+            this->puzzle->strikeFromGroup(
+                &this->puzzle->row_groups,
+                &this->puzzle->row_groups.at(solved_idx),
+                solved_idx,
+                puzzle_value);
+
+            // Strike from row groups
+            this->puzzle->strikeFromGroup(
+                &this->puzzle->col_groups,
+                &this->puzzle->col_groups.at(solved_idx),
+                solved_idx,
+                puzzle_value);
+
+            // Strike from row groups
+            this->puzzle->strikeFromGroup(
+                &this->puzzle->blk_groups,
+                &this->puzzle->blk_groups.at(solved_idx),
+                solved_idx,
+                puzzle_value);
+        }
+
+        // Clear the solved indices
+        this->puzzle->resetSolvedIndices();
+
+        // Determine which of the unsolved have been solved
+
+
+        // If we've added any solved indices, we're not done
+        is_done = initial_unsolved == this->puzzle->numUnsolved();
+    }
 }
 
 void Solver::unique(bool *updated)

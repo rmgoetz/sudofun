@@ -1,6 +1,8 @@
 
 #include "puzzle.hpp"
 #include "utils.hpp"
+#include <iostream>
+#include <iomanip>
 
 Puzzle::Puzzle()
 {
@@ -53,6 +55,63 @@ uint16_t Puzzle::getValue(uint8_t index)
     return data.at(index);
 }
 
+uint8_t Puzzle::numUnsolved()
+{
+    return this->unsolved_indices.size();
+}
+
+void Puzzle::removeFromGroup(std::vector<uint8_t> *group_vec, const uint8_t &cut_index)
+{
+    // If the cut index is in the group, remove it (there will be at most one instance).
+    // NOTE: using std::find instead of this loop fails to compile on my build system
+    for (auto it = group_vec->begin(); it != group_vec->end(); ++it)
+    {
+        if (*it == cut_index)
+        {
+            group_vec->erase(it);
+            break;
+        }
+    }
+}
+
+void Puzzle::strikeFromGroup(
+    std::array<std::vector<uint8_t>, 81> *group,
+    std::vector<uint8_t> *group_vec,
+    const uint8_t &cut_index,
+    const uint16_t &ref_val)
+{
+    //
+    for (const uint8_t &neighbor_idx : *group_vec)
+    {
+        this->data[neighbor_idx] -= this->data[neighbor_idx] & ref_val;
+        this->removeFromGroup(&group->at(neighbor_idx), cut_index);
+    }
+}
+
+void Puzzle::removeSolvedFromGroups()
+{
+    // Loop over the latest solved indices
+    for (const uint8_t &solved_idx : this->latest_solved_indices)
+    {
+        uint16_t puzzle_value = this->getValue(solved_idx);
+
+        // Remove from the
+        this->removeFromGroup(&this->row_groups.at(solved_idx), solved_idx);
+        this->removeFromGroup(&this->col_groups.at(solved_idx), solved_idx);
+        this->removeFromGroup(&this->blk_groups.at(solved_idx), solved_idx);
+    }
+}
+
+void Puzzle::resetSolvedIndices()
+{
+    this->latest_solved_indices.clear();
+}
+
+void checkUnsolved()
+{
+    // Check
+}
+
 void Puzzle::addClueString(Clue *clue)
 {
 
@@ -66,10 +125,15 @@ void Puzzle::addClueString(Clue *clue)
         uint8_t row_idx = static_cast<uint8_t>(s[0] - '0') - 1;
         uint8_t col_idx = static_cast<uint8_t>(s[1] - '0') - 1;
         uint8_t val_num = static_cast<uint8_t>(s[2] - '0');
+        uint8_t flat_index = row_idx * 9 + col_idx;
 
         // Set the corresponding flat index to the value converted to a 9-bit representation
-        this->setValue(row_idx * 9 + col_idx, utils::valueToNineBit(val_num));
+        this->setValue(flat_index, utils::valueToNineBit(val_num));
+
+        // Add to the list of solved and remove from unsolved
     }
+
+    this->removeSolvedFromGroups();
 }
 
 /**
@@ -83,4 +147,21 @@ std::tuple<uint8_t, uint8_t, std::vector<uint8_t>> Puzzle::leastPopularBit()
 
 void Puzzle::validPuzzle(bool *goodness)
 {
+}
+
+void Puzzle::printPuzzle()
+{
+    for (int i = 0; i < 81; ++i)
+    {
+
+        std::cout << std::setw(3) << this->getValue(i) << " ";
+        if ((i + 1) % 9 == 0)
+        {
+            std::cout << std::endl;
+        }
+        else
+        {
+            std::cout.flush();
+        }
+    }
 }
