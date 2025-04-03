@@ -9,6 +9,9 @@ Puzzle::Puzzle()
     // Initialize the puzzle data to be entirely unsolved
     data.fill(511); // bin(511) = 0000000111111111
 
+    // Signify that we haven't loaded any clue yet
+    loaded_clue = false;
+
     // Build the row/col/blk groups
     for (int k = 0; k < 81; ++k)
     {
@@ -115,6 +118,11 @@ void checkUnsolved()
 void Puzzle::addClueString(Clue *clue)
 {
 
+    if (this->loaded_clue)
+    {
+        throw std::runtime_error("A clue has already been added to this puzzle");
+    }
+
     for (auto i = clue->begin(); i != clue->end(); ++i)
     {
         //
@@ -130,7 +138,18 @@ void Puzzle::addClueString(Clue *clue)
         // Set the corresponding flat index to the value converted to a 9-bit representation
         this->setValue(flat_index, utils::valueToNineBit(val_num));
 
-        // Add to the list of solved and remove from unsolved
+        // Add to the list of solved
+        this->latest_solved_indices.push_back(flat_index);
+
+        // Remove from the unsolved list
+        for (auto it = this->unsolved_indices.begin(); it != this->unsolved_indices.end(); ++it)
+        {
+            if (*it == flat_index)
+            {
+                this->unsolved_indices.erase(it);
+                break;
+            }
+        }
     }
 
     this->removeSolvedFromGroups();

@@ -13,6 +13,7 @@ class Puzzle
 private:
     // Data attribute tracking the solution space for each square
     std::array<uint16_t, 81> data;
+    bool loaded_clue;
 
 public:
     // Companion data objects to track row, column, and block groups (in the flat index).
