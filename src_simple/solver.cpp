@@ -23,6 +23,12 @@ void Solver::strike(bool *updated)
     }
 }
 
+/**
+ * @brief If an unsolved element has a uniqu bit amongst its row, column, or block, all but the unique
+ * bit are dropped and the element is now solved
+ *
+ * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
+ */
 void Solver::unique(bool *updated)
 {
     uint32_t initial_unsolved = this->puzzle->numUnsolved();
@@ -31,56 +37,40 @@ void Solver::unique(bool *updated)
     {
         // First check among the row group
         uint16_t unsolved_val = this->puzzle->getValue(unsolved_idx);
-        uint16_t unq_track = 0;
-        for (const uint32_t &neighbor_idx : *this->puzzle->getRowGroup(unsolved_idx))
-        {
-            if (unsolved_idx != neighbor_idx)
-            {
-                unq_track |= this->puzzle->getValue(neighbor_idx);
-            }
-        }
-        unq_track ^= 511;
-        unq_track &= unsolved_val;
 
-        if (unq_track != 0)
+        // Determine which bits do not appear in the row neighbors
+        uint16_t unique_bits = this->puzzle->rowNeighborBits(unsolved_idx);
+        unique_bits ^= 511; // bin(511) = 111111111
+
+        // Of those missing bits, does our unsolved value contain any of them
+        unique_bits &= unsolved_val;
+
+        // If the value is nonzero, then there is a unique bit in our unsolved element. Technically we have
+        // only checked that there are any unique bits, but our solver pipeline guarantees that as long as 
+        // the clue is valid there will only ever be one unique bit when there are any.
+        if (unique_bits != 0)
         {
-            this->puzzle->setValue(unsolved_idx, unq_track);
+            this->puzzle->setValue(unsolved_idx, unique_bits);
         }
         else
         {
             // If not a unique among the row, check the column
-            unq_track = 0;
-            for (const uint32_t &neighbor_idx : *this->puzzle->getColGroup(unsolved_idx))
+            unique_bits = this->puzzle->colNeighborBits(unsolved_idx);
+            unique_bits ^= 511; // bin(511) = 111111111
+            unique_bits &= unsolved_val;
+            if (unique_bits != 0)
             {
-                if (unsolved_idx != neighbor_idx)
-                {
-                    unq_track |= this->puzzle->getValue(neighbor_idx);
-                }
-            }
-            unq_track ^= 511;
-            unq_track &= unsolved_val;
-
-            if (unq_track != 0)
-            {
-                this->puzzle->setValue(unsolved_idx, unq_track);
+                this->puzzle->setValue(unsolved_idx, unique_bits);
             }
             else
             {
                 // If not a unique among the column, check the block
-                unq_track = 0;
-                for (const uint32_t &neighbor_idx : *this->puzzle->getBlkGroup(unsolved_idx))
+                unique_bits = this->puzzle->blkNeighborBits(unsolved_idx);
+                unique_bits ^= 511; // bin(511) = 111111111
+                unique_bits &= unsolved_val;
+                if (unique_bits != 0)
                 {
-                    if (unsolved_idx != neighbor_idx)
-                    {
-                        unq_track |= this->puzzle->getValue(neighbor_idx);
-                    }
-                }
-                unq_track ^= 511;
-                unq_track &= unsolved_val;
-
-                if (unq_track != 0)
-                {
-                    this->puzzle->setValue(unsolved_idx, unq_track);
+                    this->puzzle->setValue(unsolved_idx, unique_bits);
                 }
             }
         }
@@ -110,6 +100,12 @@ void Solver::pigeon(bool *updated)
     this->postStepUpdate();
 }
 
+/**
+ * @brief In every row and column, divide the row/column into three parts according to block membership.
+ * If any of the three parts has a unique bit, remove that bit from the remaining members of that part's block.
+ *
+ * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
+ */
 void Solver::squeeze(bool *updated)
 {
     for (uint32_t i = 0; i < 9; ++i)

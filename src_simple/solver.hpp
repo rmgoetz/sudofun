@@ -1,6 +1,6 @@
 
-#ifndef SOLVER_CLASS_HEADER
-#define SOLVER_CLASS_HEADER
+#ifndef SUDOFUN_SOLVER_CLASS_HEADER
+#define SUDOFUN_SOLVER_CLASS_HEADER
 
 #include "puzzle.hpp"
 

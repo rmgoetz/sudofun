@@ -5,6 +5,17 @@
 #include <iomanip>
 #include <stdio.h>
 
+const std::array<std::array<uint32_t, 3>, 81> *Puzzle::flat_to_row_col_block = &FLAT_TO_ROW_COL_BLK;
+const std::array<std::array<uint32_t, 9>, 9> *Puzzle::row_to_flat = &ROW_TO_FLAT;
+const std::array<std::array<uint32_t, 9>, 9> *Puzzle::col_to_flat = &COL_TO_FLAT;
+const std::array<std::array<uint32_t, 9>, 9> *Puzzle::blk_to_flat = &BLK_TO_FLAT;
+const std::array<std::array<uint32_t, 9>, 9> *Puzzle::row_to_col = &ROW_TO_COL;
+const std::array<std::array<uint32_t, 9>, 9> *Puzzle::col_to_row = &COL_TO_ROW;
+const std::array<std::array<uint32_t, 3>, 9> *Puzzle::row_to_blk = &ROW_TO_BLK;
+const std::array<std::array<uint32_t, 3>, 9> *Puzzle::col_to_blk = &COL_TO_BLK;
+const std::array<std::array<uint32_t, 3>, 9> *Puzzle::blk_to_row = &BLK_TO_ROW;
+const std::array<std::array<uint32_t, 3>, 9> *Puzzle::blk_to_col = &BLK_TO_COL;
+
 Puzzle::Puzzle()
 {
     // Initialize the puzzle data to be entirely unsolved
@@ -13,27 +24,11 @@ Puzzle::Puzzle()
     // Signify that we haven't loaded any clue yet
     loaded_clue = false;
 
-    // Build the row/col/blk groups
-    for (int k = 0; k < 81; ++k)
-    {
-        // Add index to unsolved list
-        this->unsolved_indices.push_back(k);
-
-        // The row/col/blk index for the kth (flat) puzzle element
-        uint32_t i = k / 9;
-        uint32_t j = k % 9;
-        uint32_t g = 3 * (i / 3) + (j / 3);
-
-        // Populate the row/col/blk groups
-        this->row_groups.at(i).push_back(k);
-        this->col_groups.at(j).push_back(k);
-        this->blk_groups.at(g).push_back(k);
-
-        // Populate the index -> group maps
-        this->row_map[k] = i;
-        this->col_map[k] = j;
-        this->blk_map[k] = g;
-    }
+    //
+    unsolved_indices = INIT_UNSOLVED_INDICES;
+    row_groups = INIT_ROW_GROUPS;
+    col_groups = INIT_COL_GROUPS;
+    blk_groups = INIT_BLK_GROUPS;
 }
 
 /**
@@ -96,19 +91,34 @@ uint32_t Puzzle::numUnsolved()
     return this->unsolved_indices.size();
 }
 
+const uint32_t &Puzzle::getRowIndex(const uint32_t &flat_index)
+{
+    return this->flat_to_row_col_block->at(flat_index).at(0);
+}
+
+const uint32_t &Puzzle::getColIndex(const uint32_t &flat_index)
+{
+    return this->flat_to_row_col_block->at(flat_index).at(1);
+}
+
+const uint32_t &Puzzle::getBlkIndex(const uint32_t &flat_index)
+{
+    return this->flat_to_row_col_block->at(flat_index).at(2);
+}
+
 std::vector<uint32_t> *Puzzle::getRowGroup(const uint32_t &flat_idx)
 {
-    return &this->row_groups.at(this->row_map[flat_idx]);
+    return &this->row_groups.at(this->getRowIndex(flat_idx));
 }
 
-std::vector<uint32_t> *Puzzle::getColGroup(const uint32_t &flat_idx) 
+std::vector<uint32_t> *Puzzle::getColGroup(const uint32_t &flat_idx)
 {
-    return &this->col_groups.at(this->col_map[flat_idx]);
+    return &this->col_groups.at(this->getColIndex(flat_idx));
 }
 
-std::vector<uint32_t> *Puzzle::getBlkGroup(const uint32_t &flat_idx) 
+std::vector<uint32_t> *Puzzle::getBlkGroup(const uint32_t &flat_idx)
 {
-    return &this->blk_groups.at(this->blk_map[flat_idx]);
+    return &this->blk_groups.at(this->getBlkIndex(flat_idx));
 }
 
 /**
@@ -134,9 +144,9 @@ void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_index)
 void Puzzle::removeFromGroups(const uint32_t &cut_index)
 {
     // Convert to row, col, and blk indices
-    uint32_t row_idx = this->row_map[cut_index];
-    uint32_t col_idx = this->col_map[cut_index];
-    uint32_t blk_idx = this->blk_map[cut_index];
+    uint32_t row_idx = this->flat_to_row_col_block->at(cut_index).at(0);
+    uint32_t col_idx = this->flat_to_row_col_block->at(cut_index).at(1);
+    uint32_t blk_idx = this->flat_to_row_col_block->at(cut_index).at(2);
 
     // If the cut index is in the group, remove it (there will be at most one instance).
     // NOTE: using std::find instead of this loop fails to compile on my build system
@@ -187,9 +197,9 @@ void Puzzle::bitRemoveFromGroup(std::vector<uint32_t> *group, const uint32_t &st
  */
 void Puzzle::strikeFromPuzzle(const uint32_t &strike_idx)
 {
-    uint32_t row_idx = this->row_map[strike_idx];
-    uint32_t col_idx = this->col_map[strike_idx];
-    uint32_t blk_idx = this->blk_map[strike_idx];
+    uint32_t row_idx = this->getRowIndex(strike_idx);
+    uint32_t col_idx = this->getColIndex(strike_idx);
+    uint32_t blk_idx = this->getBlkIndex(strike_idx);
     uint16_t puzzle_value = this->getValue(strike_idx);
 
     this->bitRemoveFromGroup(&this->row_groups.at(row_idx), strike_idx, puzzle_value);
@@ -208,6 +218,51 @@ void Puzzle::strikeFromPuzzle(const std::vector<uint32_t> &strike_idx_vec)
 void Puzzle::strikeLatestFromPuzzle()
 {
     this->strikeFromPuzzle(this->latest_solved_indices);
+}
+
+uint16_t Puzzle::rowNeighborBits(const uint32_t &index)
+{
+    uint16_t neighbor_bits = 0;
+    // Accumulate all of the bits found amongst row neighbors
+    for (const uint32_t &neighbor_idx : *this->getRowGroup(index))
+    {
+        if (index != neighbor_idx)
+        {
+            neighbor_bits |= this->getValue(neighbor_idx);
+        }
+    }
+
+    return neighbor_bits;
+}
+
+uint16_t Puzzle::colNeighborBits(const uint32_t &index)
+{
+    uint16_t neighbor_bits = 0;
+    // Accumulate all of the bits found amongst col neighbors
+    for (const uint32_t &neighbor_idx : *this->getColGroup(index))
+    {
+        if (index != neighbor_idx)
+        {
+            neighbor_bits |= this->getValue(neighbor_idx);
+        }
+    }
+
+    return neighbor_bits;
+}
+
+uint16_t Puzzle::blkNeighborBits(const uint32_t &index)
+{
+    uint16_t neighbor_bits = 0;
+    // Accumulate all of the bits found amongst blk neighbors
+    for (const uint32_t &neighbor_idx : *this->getBlkGroup(index))
+    {
+        if (index != neighbor_idx)
+        {
+            neighbor_bits |= this->getValue(neighbor_idx);
+        }
+    }
+
+    return neighbor_bits;
 }
 
 void Puzzle::resetSolvedIndices()
@@ -298,7 +353,7 @@ void Puzzle::printRowMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->row_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getRowIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -314,7 +369,7 @@ void Puzzle::printColMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->col_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getColIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -330,7 +385,7 @@ void Puzzle::printBlkMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->blk_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getBlkIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;

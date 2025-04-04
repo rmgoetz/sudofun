@@ -56,7 +56,6 @@ int main()
     // puzzle.printColMap(); 
     // std::cout.flush();
 
-
     // std::cout << "\n\n" << std::endl;
     // puzzle.printBlkMap(); 
     // std::cout.flush();
