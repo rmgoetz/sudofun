@@ -96,6 +96,21 @@ uint32_t Puzzle::numUnsolved()
     return this->unsolved_indices.size();
 }
 
+std::vector<uint32_t> *Puzzle::getRowGroup(const uint32_t &flat_idx)
+{
+    return &this->row_groups.at(this->row_map[flat_idx]);
+}
+
+std::vector<uint32_t> *Puzzle::getColGroup(const uint32_t &flat_idx) 
+{
+    return &this->col_groups.at(this->col_map[flat_idx]);
+}
+
+std::vector<uint32_t> *Puzzle::getBlkGroup(const uint32_t &flat_idx) 
+{
+    return &this->blk_groups.at(this->blk_map[flat_idx]);
+}
+
 /**
  * @brief
  *

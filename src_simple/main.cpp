@@ -48,29 +48,34 @@ int main()
     // std::cout << "\n\n" << std::endl;
     // puzzle.printGroup(puzzle.blk_groups); 
 
-    std::cout << "\n\n" << std::endl;
-    puzzle.printRowMap(); 
-    std::cout.flush();
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printRowMap(); 
+    // std::cout.flush();
 
-    std::cout << "\n\n" << std::endl;
-    puzzle.printColMap(); 
-    std::cout.flush();
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printColMap(); 
+    // std::cout.flush();
 
 
-    std::cout << "\n\n" << std::endl;
-    puzzle.printBlkMap(); 
-    std::cout.flush();
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printBlkMap(); 
+    // std::cout.flush();
 
 
     Solver solver = Solver(&puzzle);
 
     bool updated = false;
     solver.strike(&updated);
+    std::cout << "\n\n" << std::endl;
+    puzzle.printPuzzle();
+
+    solver.unique(&updated);
+    solver.strike(&updated);
     std::cout.flush();
 
 
-    puzzle.printPuzzle();
     std::cout << "\n\n" << std::endl;
+    puzzle.printPuzzle();
     // puzzle.printUnsolved();
 
     return 0;

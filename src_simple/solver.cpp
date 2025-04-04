@@ -25,11 +25,72 @@ void Solver::strike(bool *updated)
 
 void Solver::unique(bool *updated)
 {
+    uint32_t initial_unsolved = this->puzzle->numUnsolved();
+
     for (const uint32_t &unsolved_idx : this->puzzle->unsolved_indices)
     {
+        // First check among the row group
+        uint16_t unsolved_val = this->puzzle->getValue(unsolved_idx);
+        uint16_t unq_track = 0;
+        for (const uint32_t &neighbor_idx : *this->puzzle->getRowGroup(unsolved_idx))
+        {
+            if (unsolved_idx != neighbor_idx)
+            {
+                unq_track |= this->puzzle->getValue(neighbor_idx);
+            }
+        }
+        unq_track ^= 511;
+        unq_track &= unsolved_val;
+
+        if (unq_track != 0)
+        {
+            this->puzzle->setValue(unsolved_idx, unq_track);
+        }
+        else
+        {
+            // If not a unique among the row, check the column
+            unq_track = 0;
+            for (const uint32_t &neighbor_idx : *this->puzzle->getColGroup(unsolved_idx))
+            {
+                if (unsolved_idx != neighbor_idx)
+                {
+                    unq_track |= this->puzzle->getValue(neighbor_idx);
+                }
+            }
+            unq_track ^= 511;
+            unq_track &= unsolved_val;
+
+            if (unq_track != 0)
+            {
+                this->puzzle->setValue(unsolved_idx, unq_track);
+            }
+            else
+            {
+                // If not a unique among the column, check the block
+                unq_track = 0;
+                for (const uint32_t &neighbor_idx : *this->puzzle->getBlkGroup(unsolved_idx))
+                {
+                    if (unsolved_idx != neighbor_idx)
+                    {
+                        unq_track |= this->puzzle->getValue(neighbor_idx);
+                    }
+                }
+                unq_track ^= 511;
+                unq_track &= unsolved_val;
+
+                if (unq_track != 0)
+                {
+                    this->puzzle->setValue(unsolved_idx, unq_track);
+                }
+            }
+        }
     }
 
+    // Update the unsolved and recently solved
     this->postStepUpdate();
+
+    // Track if we've made any update
+    *updated |= initial_unsolved == this->puzzle->numUnsolved();
 }
 
 void Solver::pigeon(bool *updated)

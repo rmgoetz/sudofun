@@ -43,6 +43,10 @@ public:
     uint16_t getValue(uint32_t index);
     uint32_t numUnsolved();
 
+    std::vector<uint32_t> *getRowGroup(const uint32_t &flat_idx);
+    std::vector<uint32_t> *getColGroup(const uint32_t &flat_idx);
+    std::vector<uint32_t> *getBlkGroup(const uint32_t &flat_idx);
+
     // Methods to remove indices or vectors of indices from the unsolved row/col/blk groups
     void removeFromGroups(const uint32_t &cut_index);
     void removeFromGroups(const std::vector<uint32_t> &cut_vector);
