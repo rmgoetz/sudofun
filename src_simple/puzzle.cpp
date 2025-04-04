@@ -3,6 +3,7 @@
 #include "utils.hpp"
 #include <iostream>
 #include <iomanip>
+#include <stdio.h>
 
 Puzzle::Puzzle()
 {
@@ -101,13 +102,13 @@ uint32_t Puzzle::numUnsolved()
  * @param group
  * @param cut_value
  */
-void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_value)
+void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_index)
 {
     // If the cut index is in the group, remove it (there will be at most one instance).
     // NOTE: using std::find instead of this loop fails to compile on my build system
     for (auto it = group->begin(); it != group->end(); ++it)
     {
-        if (*it == cut_value)
+        if (*it == cut_index)
         {
             group->erase(it);
             break;
@@ -115,18 +116,18 @@ void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_value)
     }
 }
 
-void Puzzle::removeFromGroups(const uint32_t &cut_value)
+void Puzzle::removeFromGroups(const uint32_t &cut_index)
 {
     // Convert to row, col, and blk indices
-    uint32_t row_idx = this->row_map[cut_value];
-    uint32_t col_idx = this->col_map[cut_value];
-    uint32_t blk_idx = this->blk_map[cut_value];
+    uint32_t row_idx = this->row_map[cut_index];
+    uint32_t col_idx = this->col_map[cut_index];
+    uint32_t blk_idx = this->blk_map[cut_index];
 
     // If the cut index is in the group, remove it (there will be at most one instance).
     // NOTE: using std::find instead of this loop fails to compile on my build system
-    removeFromGroup(&this->row_groups.at(row_idx), cut_value);
-    removeFromGroup(&this->col_groups.at(col_idx), cut_value);
-    removeFromGroup(&this->blk_groups.at(blk_idx), cut_value);
+    removeFromGroup(&this->row_groups.at(row_idx), cut_index);
+    removeFromGroup(&this->col_groups.at(col_idx), cut_index);
+    removeFromGroup(&this->blk_groups.at(blk_idx), cut_index);
 }
 
 void Puzzle::removeFromGroups(const std::vector<uint32_t> &cut_vector)
@@ -139,7 +140,7 @@ void Puzzle::removeFromGroups(const std::vector<uint32_t> &cut_vector)
 
 void Puzzle::bitRemoveFromGroup(std::vector<uint32_t> *group, const uint32_t &strike_idx, const uint16_t &strike_val)
 {
-    uint32_t remove_offset = 0;
+    uint32_t remove_offset = 9;
     uint32_t count = 0;
 
     // Remove the bit from every other member of the group
@@ -157,7 +158,10 @@ void Puzzle::bitRemoveFromGroup(std::vector<uint32_t> *group, const uint32_t &st
     }
 
     // Remove the corresponding struck cell from the group
-    group->erase(group->begin() + remove_offset);
+    if (remove_offset < 9)
+    {
+        group->erase(group->begin() + remove_offset);
+    }
 }
 
 /**
@@ -173,11 +177,6 @@ void Puzzle::strikeFromPuzzle(const uint32_t &strike_idx)
     uint32_t blk_idx = this->blk_map[strike_idx];
     uint16_t puzzle_value = this->getValue(strike_idx);
 
-    
-
-    std::cout << row_idx << " " << col_idx << " " << blk_idx << std::endl;
-    std::cout << puzzle_value << std::endl;
-
     this->bitRemoveFromGroup(&this->row_groups.at(row_idx), strike_idx, puzzle_value);
     this->bitRemoveFromGroup(&this->col_groups.at(col_idx), strike_idx, puzzle_value);
     this->bitRemoveFromGroup(&this->blk_groups.at(blk_idx), strike_idx, puzzle_value);
@@ -187,7 +186,6 @@ void Puzzle::strikeFromPuzzle(const std::vector<uint32_t> &strike_idx_vec)
 {
     for (const uint32_t &strike_idx : strike_idx_vec)
     {
-        std::cout << "strike idx: " << strike_idx << std::endl;
         this->strikeFromPuzzle(strike_idx);
     }
 }
@@ -285,7 +283,7 @@ void Puzzle::printRowMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << (int)k << "->" << (int)this->row_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->row_map[k] << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -293,7 +291,7 @@ void Puzzle::printRowMap()
         else
         {
             std::cout.flush();
-        } 
+        }
     }
 }
 
@@ -301,7 +299,7 @@ void Puzzle::printColMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << (int)k << "->" << (int)this->col_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->col_map[k] << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -309,7 +307,7 @@ void Puzzle::printColMap()
         else
         {
             std::cout.flush();
-        } 
+        }
     }
 }
 
@@ -317,7 +315,7 @@ void Puzzle::printBlkMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << (int)k << "->" << (int)this->blk_map[k] << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->blk_map[k] << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -325,6 +323,6 @@ void Puzzle::printBlkMap()
         else
         {
             std::cout.flush();
-        } 
+        }
     }
 }

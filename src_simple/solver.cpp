@@ -12,11 +12,6 @@ void Solver::strike(bool *updated)
         // Strike the recently solved from the puzzle
         this->puzzle->strikeLatestFromPuzzle();
 
-        this->puzzle->printPuzzle();
-        this->puzzle->printGroup(this->puzzle->row_groups);
-        this->puzzle->printGroup(this->puzzle->col_groups);
-        this->puzzle->printGroup(this->puzzle->blk_groups);
-
         // Update the unsolved and recently solved
         this->postStepUpdate();
 

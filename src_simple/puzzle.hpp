@@ -44,7 +44,7 @@ public:
     uint32_t numUnsolved();
 
     // Methods to remove indices or vectors of indices from the unsolved row/col/blk groups
-    void removeFromGroups(const uint32_t &cut_value);
+    void removeFromGroups(const uint32_t &cut_index);
     void removeFromGroups(const std::vector<uint32_t> &cut_vector);
 
     // Strike functions
