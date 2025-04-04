@@ -63,13 +63,13 @@ uint8_t Puzzle::numUnsolved()
     return this->unsolved_indices.size();
 }
 
-void Puzzle::removeFromGroup(std::vector<uint8_t> *group_vec, const uint8_t &cut_index)
+void Puzzle::removeFromGroup(std::vector<uint8_t> *group_vec, const uint8_t &cut_value)
 {
     // If the cut index is in the group, remove it (there will be at most one instance).
     // NOTE: using std::find instead of this loop fails to compile on my build system
     for (auto it = group_vec->begin(); it != group_vec->end(); ++it)
     {
-        if (*it == cut_index)
+        if (*it == cut_value)
         {
             group_vec->erase(it);
             break;
@@ -77,20 +77,32 @@ void Puzzle::removeFromGroup(std::vector<uint8_t> *group_vec, const uint8_t &cut
     }
 }
 
+/**
+ * @brief 
+ * 
+ * @param group 
+ * @param group_vec 
+ * @param cut_value 
+ * @param ref_val 
+ */
 void Puzzle::strikeFromGroup(
     std::array<std::vector<uint8_t>, 81> *group,
     std::vector<uint8_t> *group_vec,
-    const uint8_t &cut_index,
+    const uint8_t &cut_value,
     const uint16_t &ref_val)
 {
     //
     for (const uint8_t &neighbor_idx : *group_vec)
     {
         this->data[neighbor_idx] -= this->data[neighbor_idx] & ref_val;
-        this->removeFromGroup(&group->at(neighbor_idx), cut_index);
+        this->removeFromGroup(&group->at(neighbor_idx), cut_value);
     }
 }
 
+/**
+ * @brief 
+ * 
+ */
 void Puzzle::removeSolvedFromGroups()
 {
     // Loop over the latest solved indices
@@ -110,9 +122,30 @@ void Puzzle::resetSolvedIndices()
     this->latest_solved_indices.clear();
 }
 
-void checkUnsolved()
+void Puzzle::checkUnsolved()
 {
-    // Check
+    // Check which flat indices have been solved and put them into the latest solved vector
+    uint8_t index_in_unsolved = 0;
+    std::vector<uint8_t> indices_to_remove;
+    for (const uint8_t &puzzle_index : this->unsolved_indices)
+    {
+        if (utils::countBits(this->getValue(puzzle_index)) == 1)
+        {
+            // Add this index to latest solved
+            this->latest_solved_indices.push_back(puzzle_index);
+
+            // Push this index into the tracker
+            indices_to_remove.push_back(index_in_unsolved);
+        }
+
+        ++index_in_unsolved;
+    }
+
+    // Iterate in reverse through the indices to remove from the unsolved indices
+    for (auto it = indices_to_remove.rbegin(); it != indices_to_remove.rend(); ++it)
+    {
+        this->unsolved_indices.erase(this->unsolved_indices.begin() + *it);
+    }
 }
 
 void Puzzle::addClueString(Clue *clue)
@@ -172,7 +205,6 @@ void Puzzle::printPuzzle()
 {
     for (int i = 0; i < 81; ++i)
     {
-
         std::cout << std::setw(3) << this->getValue(i) << " ";
         if ((i + 1) % 9 == 0)
         {
@@ -183,4 +215,14 @@ void Puzzle::printPuzzle()
             std::cout.flush();
         }
     }
+}
+
+void Puzzle::printUnsolved()
+{
+    for (const uint8_t &index : this->unsolved_indices)
+    {
+        std::cout << (int)index << " ";
+    }
+
+    std::cout << std::endl;
 }

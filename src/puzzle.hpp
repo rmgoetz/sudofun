@@ -16,10 +16,16 @@ private:
     bool loaded_clue;
 
 public:
-    // Companion data objects to track row, column, and block groups (in the flat index).
+    // Companion data objects to track the unsolved row, column, and block neighbors for
+    // each puzzle index
     std::array<std::vector<uint8_t>, 81> row_groups;
     std::array<std::vector<uint8_t>, 81> col_groups;
     std::array<std::vector<uint8_t>, 81> blk_groups;
+
+    std::array<std::vector<uint8_t>, 9> row_groups_n;
+    std::array<std::vector<uint8_t>, 9> col_groups_n;
+    std::array<std::vector<uint8_t>, 9> blk_groups_n;
+
 
     // Companion objects to track which indices have been solved, and which haven't
     std::vector<uint8_t> latest_solved_indices;
@@ -58,6 +64,7 @@ public:
     void validPuzzle(bool *goodness);
 
     void printPuzzle();
+    void printUnsolved();
 };
 
 #endif

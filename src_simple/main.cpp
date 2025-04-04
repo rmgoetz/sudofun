@@ -23,7 +23,7 @@ int main()
     // std::cout << in_small_num << " converts to " << utils::valueToNineBit(in_small_num) << std::endl;
 
     std::string innie;
-    std::cout << "Enter a clue string: ";
+    std::cout << "Enter a clue string for simple src: ";
     std::cin >> innie;
     std::cout << "The validated cluestring output: " << Clue::validateString(innie) << std::endl;
 
@@ -31,10 +31,30 @@ int main()
     Puzzle puzzle = Puzzle();
     puzzle.addClueString(&clue);
     puzzle.printPuzzle();
+
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printUnsolved();
+
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printGroup(puzzle.row_groups); 
+
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printGroup(puzzle.col_groups); 
+    
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printGroup(puzzle.blk_groups); 
+
     std::cout << "\n\n" << std::endl;
-    puzzle.printUnsolved();
+    puzzle.printRowMap(); 
+
     std::cout << "\n\n" << std::endl;
+    puzzle.printColMap(); 
+
+    std::cout << "\n\n" << std::endl;
+    puzzle.printBlkMap(); 
+
     Solver solver = Solver(&puzzle);
+
     bool updated = false;
     solver.strike(&updated);
 

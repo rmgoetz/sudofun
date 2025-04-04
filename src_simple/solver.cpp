@@ -7,33 +7,15 @@ void Solver::strike(bool *updated)
 
     while (!is_done)
     {
-        uint8_t initial_unsolved = this->puzzle->numUnsolved();
+        uint32_t initial_unsolved = this->puzzle->numUnsolved();
 
-        for (const uint8_t &solved_idx : this->puzzle->latest_solved_indices)
-        {
-            uint16_t puzzle_value = this->puzzle->getValue(solved_idx);
+        // Strike the recently solved from the puzzle
+        this->puzzle->strikeLatestFromPuzzle();
 
-            // Strike from row groups
-            this->puzzle->strikeFromGroup(
-                &this->puzzle->row_groups,
-                &this->puzzle->row_groups.at(solved_idx),
-                solved_idx,
-                puzzle_value);
-
-            // Strike from row groups
-            this->puzzle->strikeFromGroup(
-                &this->puzzle->col_groups,
-                &this->puzzle->col_groups.at(solved_idx),
-                solved_idx,
-                puzzle_value);
-
-            // Strike from row groups
-            this->puzzle->strikeFromGroup(
-                &this->puzzle->blk_groups,
-                &this->puzzle->blk_groups.at(solved_idx),
-                solved_idx,
-                puzzle_value);
-        }
+        this->puzzle->printPuzzle();
+        this->puzzle->printGroup(this->puzzle->row_groups);
+        this->puzzle->printGroup(this->puzzle->col_groups);
+        this->puzzle->printGroup(this->puzzle->blk_groups);
 
         // Update the unsolved and recently solved
         this->postStepUpdate();
@@ -48,7 +30,7 @@ void Solver::strike(bool *updated)
 
 void Solver::unique(bool *updated)
 {
-    for (const uint8_t &unsolved_idx : this->puzzle->unsolved_indices)
+    for (const uint32_t &unsolved_idx : this->puzzle->unsolved_indices)
     {
     }
 
@@ -57,15 +39,15 @@ void Solver::unique(bool *updated)
 
 void Solver::pigeon(bool *updated)
 {
-    for (uint8_t i = 0; i < 9; ++i)
+    for (uint32_t i = 0; i < 9; ++i)
     {
     }
 
-    for (uint8_t j = 0; j < 9; ++j)
+    for (uint32_t j = 0; j < 9; ++j)
     {
     }
 
-    for (uint8_t g = 0; g < 9; ++g)
+    for (uint32_t g = 0; g < 9; ++g)
     {
     }
 
@@ -74,11 +56,11 @@ void Solver::pigeon(bool *updated)
 
 void Solver::squeeze(bool *updated)
 {
-    for (uint8_t i = 0; i < 9; ++i)
+    for (uint32_t i = 0; i < 9; ++i)
     {
     }
 
-    for (uint8_t j = 0; j < 9; ++j)
+    for (uint32_t j = 0; j < 9; ++j)
     {
     }
 
@@ -87,7 +69,7 @@ void Solver::squeeze(bool *updated)
 
 void Solver::pipe(bool *updated)
 {
-    for (uint8_t g = 0; g < 9; ++g)
+    for (uint32_t g = 0; g < 9; ++g)
     {
     }
 
