@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <stdio.h>
 
+// Static class members
 const std::array<std::array<uint32_t, 3>, 81> *Puzzle::flat_to_row_col_block = &FLAT_TO_ROW_COL_BLK;
 const std::array<std::array<uint32_t, 9>, 9> *Puzzle::row_to_flat = &ROW_TO_FLAT;
 const std::array<std::array<uint32_t, 9>, 9> *Puzzle::col_to_flat = &COL_TO_FLAT;
@@ -26,9 +27,9 @@ Puzzle::Puzzle()
 
     //
     unsolved_indices = INIT_UNSOLVED_INDICES;
-    row_groups = INIT_ROW_GROUPS;
-    col_groups = INIT_COL_GROUPS;
-    blk_groups = INIT_BLK_GROUPS;
+    row_u_groups = INIT_ROW_GROUPS;
+    col_u_groups = INIT_COL_GROUPS;
+    blk_u_groups = INIT_BLK_GROUPS;
 }
 
 /**
@@ -73,7 +74,7 @@ void Puzzle::addClueString(Clue *clue)
         }
     }
 
-    this->removeFromGroups(this->latest_solved_indices);
+    this->removeFromUGroups(this->latest_solved_indices);
 }
 
 void Puzzle::setValue(uint32_t index, uint16_t val)
@@ -91,35 +92,92 @@ uint32_t Puzzle::numUnsolved()
     return this->unsolved_indices.size();
 }
 
-const uint32_t &Puzzle::getRowIndex(const uint32_t &flat_index)
+const uint32_t &Puzzle::refRowIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(0);
 }
 
-const uint32_t &Puzzle::getColIndex(const uint32_t &flat_index)
+const uint32_t &Puzzle::refColIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(1);
 }
 
-const uint32_t &Puzzle::getBlkIndex(const uint32_t &flat_index)
+const uint32_t &Puzzle::refBlkIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(2);
 }
 
-std::vector<uint32_t> *Puzzle::getRowGroup(const uint32_t &flat_idx)
+const std::array<uint32_t, 9> &Puzzle::refIndicesInRow(const uint32_t &row_index)
 {
-    return &this->row_groups.at(this->getRowIndex(flat_idx));
+    return row_to_flat->at(row_index);
 }
 
-std::vector<uint32_t> *Puzzle::getColGroup(const uint32_t &flat_idx)
+const std::array<uint32_t, 9> &Puzzle::refIndicesInCol(const uint32_t &col_index)
 {
-    return &this->col_groups.at(this->getColIndex(flat_idx));
+    return col_to_flat->at(col_index);
 }
 
-std::vector<uint32_t> *Puzzle::getBlkGroup(const uint32_t &flat_idx)
+const std::array<uint32_t, 9> &Puzzle::refIndicesInBlk(const uint32_t &blk_index)
 {
-    return &this->blk_groups.at(this->getBlkIndex(flat_idx));
+    return blk_to_flat->at(blk_index);
 }
+
+std::vector<uint32_t> *Puzzle::ptrRowUGroup(const uint32_t &flat_idx)
+{
+    return &this->row_u_groups.at(this->refRowIndex(flat_idx));
+}
+
+std::vector<uint32_t> *Puzzle::ptrColUGroup(const uint32_t &flat_idx)
+{
+    return &this->col_u_groups.at(this->refColIndex(flat_idx));
+}
+
+std::vector<uint32_t> *Puzzle::ptrBlkUGroup(const uint32_t &flat_idx)
+{
+    return &this->blk_u_groups.at(this->refBlkIndex(flat_idx));
+}
+
+std::array<uint32_t, 9> *Puzzle::ptrRowInCol(const uint32_t &col_index)
+{
+    return const_cast<std::array<uint32_t, 9> *>(&col_to_row->at(col_index));
+}
+
+std::array<uint32_t, 9> *Puzzle::ptrColInRow(const uint32_t &row_index)
+{
+    return const_cast<std::array<uint32_t, 9> *>(&row_to_col->at(row_index));
+}
+
+std::array<uint32_t, 3> *Puzzle::ptrRowInBlk(const uint32_t &blk_index)
+{
+    return const_cast<std::array<uint32_t, 3> *>(&blk_to_row->at(blk_index));
+}
+
+std::array<uint32_t, 3> *Puzzle::ptrColInBlk(const uint32_t &blk_index)
+{
+    return const_cast<std::array<uint32_t, 3> *>(&blk_to_col->at(blk_index));
+}
+
+std::array<uint32_t, 3> *Puzzle::ptrBlkInRow(const uint32_t &row_index)
+{
+    return const_cast<std::array<uint32_t, 3> *>(&row_to_blk->at(row_index));
+}
+
+std::array<uint32_t, 3> *Puzzle::ptrBlkInCol(const uint32_t &col_index)
+{
+    return const_cast<std::array<uint32_t, 3> *>(&col_to_blk->at(col_index));
+}
+
+const std::array<uint16_t, 9> &Puzzle::getValuesInRow(const uint32_t &row_index) {}
+
+const std::array<uint16_t, 9> &Puzzle::getValuesInCol(const uint32_t &col_index) {}
+
+const std::array<uint16_t, 9> &Puzzle::getValuesInBlk(const uint32_t &blk_index) {}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index) {}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index) {}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInBlk(const uint32_t &blk_index) {}
 
 /**
  * @brief
@@ -141,7 +199,7 @@ void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_index)
     }
 }
 
-void Puzzle::removeFromGroups(const uint32_t &cut_index)
+void Puzzle::removeFromUGroups(const uint32_t &cut_index)
 {
     // Convert to row, col, and blk indices
     uint32_t row_idx = this->flat_to_row_col_block->at(cut_index).at(0);
@@ -150,20 +208,20 @@ void Puzzle::removeFromGroups(const uint32_t &cut_index)
 
     // If the cut index is in the group, remove it (there will be at most one instance).
     // NOTE: using std::find instead of this loop fails to compile on my build system
-    removeFromGroup(&this->row_groups.at(row_idx), cut_index);
-    removeFromGroup(&this->col_groups.at(col_idx), cut_index);
-    removeFromGroup(&this->blk_groups.at(blk_idx), cut_index);
+    removeFromGroup(&this->row_u_groups.at(row_idx), cut_index);
+    removeFromGroup(&this->col_u_groups.at(col_idx), cut_index);
+    removeFromGroup(&this->blk_u_groups.at(blk_idx), cut_index);
 }
 
-void Puzzle::removeFromGroups(const std::vector<uint32_t> &cut_vector)
+void Puzzle::removeFromUGroups(const std::vector<uint32_t> &cut_vector)
 {
     for (const uint32_t &cut_index : cut_vector)
     {
-        this->removeFromGroups(cut_index);
+        this->removeFromUGroups(cut_index);
     }
 }
 
-void Puzzle::bitRemoveFromGroup(std::vector<uint32_t> *group, const uint32_t &strike_idx, const uint16_t &strike_val)
+void Puzzle::bitRemoveFromUGroup(std::vector<uint32_t> *group, const uint32_t &strike_idx, const uint16_t &strike_val)
 {
     uint32_t remove_offset = 9;
     uint32_t count = 0;
@@ -197,14 +255,14 @@ void Puzzle::bitRemoveFromGroup(std::vector<uint32_t> *group, const uint32_t &st
  */
 void Puzzle::strikeFromPuzzle(const uint32_t &strike_idx)
 {
-    uint32_t row_idx = this->getRowIndex(strike_idx);
-    uint32_t col_idx = this->getColIndex(strike_idx);
-    uint32_t blk_idx = this->getBlkIndex(strike_idx);
+    uint32_t row_idx = this->refRowIndex(strike_idx);
+    uint32_t col_idx = this->refColIndex(strike_idx);
+    uint32_t blk_idx = this->refBlkIndex(strike_idx);
     uint16_t puzzle_value = this->getValue(strike_idx);
 
-    this->bitRemoveFromGroup(&this->row_groups.at(row_idx), strike_idx, puzzle_value);
-    this->bitRemoveFromGroup(&this->col_groups.at(col_idx), strike_idx, puzzle_value);
-    this->bitRemoveFromGroup(&this->blk_groups.at(blk_idx), strike_idx, puzzle_value);
+    this->bitRemoveFromUGroup(&this->row_u_groups.at(row_idx), strike_idx, puzzle_value);
+    this->bitRemoveFromUGroup(&this->col_u_groups.at(col_idx), strike_idx, puzzle_value);
+    this->bitRemoveFromUGroup(&this->blk_u_groups.at(blk_idx), strike_idx, puzzle_value);
 }
 
 void Puzzle::strikeFromPuzzle(const std::vector<uint32_t> &strike_idx_vec)
@@ -220,11 +278,48 @@ void Puzzle::strikeLatestFromPuzzle()
     this->strikeFromPuzzle(this->latest_solved_indices);
 }
 
+std::array<uint16_t, 3> Puzzle::uniqueBitsInSections(const uint32_t &row_or_col_index, bool is_row)
+{
+    // Puzzle values in the row or column
+    std::array<uint16_t *, 9> vals;
+
+    if (is_row)
+    {
+        vals = this->ptrValuesInRow(row_or_col_index);
+    }
+    else
+    {
+        vals = this->ptrValuesInCol(row_or_col_index);
+    }
+
+    // Determine what bits are present in each section
+    uint16_t section_1_bits = 0;
+    uint16_t section_2_bits = 0;
+    uint16_t section_3_bits = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        section_1_bits |= *vals.at(i);
+        section_2_bits |= *vals.at(i + 3);
+        section_3_bits |= *vals.at(i + 6);
+    }
+
+    // Identify any bits unique to a section
+    uint16_t section_1_unq = ((section_2_bits | section_3_bits) ^ 511) & section_1_bits;
+    uint16_t section_2_unq = ((section_1_bits | section_3_bits) ^ 511) & section_2_bits;
+    uint16_t section_3_unq = ((section_1_bits | section_2_bits) ^ 511) & section_3_bits;
+
+    return {section_1_unq, section_2_unq, section_3_unq};
+}
+
+std::array<uint16_t *, 6> Puzzle::blkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index) {}
+
+std::array<uint16_t *, 6> Puzzle::blkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index) {}
+
 uint16_t Puzzle::rowNeighborBits(const uint32_t &index)
 {
     uint16_t neighbor_bits = 0;
     // Accumulate all of the bits found amongst row neighbors
-    for (const uint32_t &neighbor_idx : *this->getRowGroup(index))
+    for (const uint32_t &neighbor_idx : *this->ptrRowUGroup(index))
     {
         if (index != neighbor_idx)
         {
@@ -239,7 +334,7 @@ uint16_t Puzzle::colNeighborBits(const uint32_t &index)
 {
     uint16_t neighbor_bits = 0;
     // Accumulate all of the bits found amongst col neighbors
-    for (const uint32_t &neighbor_idx : *this->getColGroup(index))
+    for (const uint32_t &neighbor_idx : *this->ptrColUGroup(index))
     {
         if (index != neighbor_idx)
         {
@@ -254,7 +349,7 @@ uint16_t Puzzle::blkNeighborBits(const uint32_t &index)
 {
     uint16_t neighbor_bits = 0;
     // Accumulate all of the bits found amongst blk neighbors
-    for (const uint32_t &neighbor_idx : *this->getBlkGroup(index))
+    for (const uint32_t &neighbor_idx : *this->ptrBlkUGroup(index))
     {
         if (index != neighbor_idx)
         {
@@ -335,7 +430,7 @@ void Puzzle::printUnsolved()
     std::cout << std::endl;
 }
 
-void Puzzle::printGroup(const std::array<std::vector<uint32_t>, 9> &group)
+void Puzzle::printUGroup(const std::array<std::vector<uint32_t>, 9> &group)
 {
     for (int i = 0; i < 9; ++i)
     {
@@ -353,7 +448,7 @@ void Puzzle::printRowMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getRowIndex(k) << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->refRowIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -369,7 +464,7 @@ void Puzzle::printColMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getColIndex(k) << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->refColIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;
@@ -385,7 +480,7 @@ void Puzzle::printBlkMap()
 {
     for (uint32_t k = 0; k < 81; ++k)
     {
-        std::cout << std::setw(2) << (int)k << " -> " << (int)this->getBlkIndex(k) << "     ";
+        std::cout << std::setw(2) << (int)k << " -> " << (int)this->refBlkIndex(k) << "     ";
         if ((k + 1) % 9 == 0)
         {
             std::cout << std::endl;

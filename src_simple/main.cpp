@@ -25,8 +25,9 @@ int main()
     std::string innie;
     std::cout << "Enter a clue string for simple src: ";
     std::cin >> innie;
-    std::cout << "The validated cluestring output: " << Clue::validateString(innie) << std::endl;
+    // std::cout << "The validated cluestring output: " << Clue::validateString(innie) << std::endl;
     std::cout.flush();
+    std::cout << "\n\n" << std::endl;
 
 
     Clue clue = Clue(innie);
@@ -63,14 +64,15 @@ int main()
 
     Solver solver = Solver(&puzzle);
 
-    bool updated = false;
-    solver.strike(&updated);
-    std::cout << "\n\n" << std::endl;
-    puzzle.printPuzzle();
+    // bool updated = false;
+    // solver.strike(&updated);
+    // std::cout << "\n\n" << std::endl;
+    // puzzle.printPuzzle();
 
-    solver.unique(&updated);
-    solver.strike(&updated);
-    std::cout.flush();
+    // solver.unique(&updated);
+    // solver.strike(&updated);
+    // std::cout.flush();
+    solver.solve(1);
 
 
     std::cout << "\n\n" << std::endl;
