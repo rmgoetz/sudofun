@@ -34,6 +34,7 @@ int main()
     Puzzle puzzle = Puzzle();
     puzzle.addClueString(&clue);
     puzzle.printPuzzle();
+    std::cout << "\n\n" << std::endl;
     std::cout.flush();
 
 
@@ -66,6 +67,11 @@ int main()
 
     // bool updated = false;
     // solver.strike(&updated);
+    // solver.unique(&updated);
+    // solver.strike(&updated);
+    // solver.squeeze(&updated);
+    // solver.strike(&updated);
+
     // std::cout << "\n\n" << std::endl;
     // puzzle.printPuzzle();
 

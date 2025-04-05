@@ -24,7 +24,7 @@ void Solver::strike(bool *updated)
 }
 
 /**
- * @brief If an unsolved element has a uniqu bit amongst its row, column, or block, all but the unique
+ * @brief If an unsolved element has a unique bit amongst its row, column, or block, all but the unique
  * bit are dropped and the element is now solved
  *
  * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
@@ -108,6 +108,8 @@ void Solver::pigeon(bool *updated)
  */
 void Solver::squeeze(bool *updated)
 {
+    uint32_t initial_unsolved = this->puzzle->numUnsolved();
+
     // Values to track unique bits
     std::array<uint16_t, 3> unique_bits;
     uint16_t unique;
@@ -119,14 +121,14 @@ void Solver::squeeze(bool *updated)
         unique_bits = this->puzzle->uniqueBitsInSections(i, true);
 
         // Loop over each of the three sections of the row
-        for (int n = 0; n < 3; ++n)
+        for (uint32_t n = 0; n < 3; ++n)
         {
             unique = unique_bits.at(n);
 
             // If there are unique bits in a section, remove them from the unsolved non-row members of the blk
             if (unique != 0)
             {
-                for (uint16_t *gval : this->puzzle->uBlkValuesNotInRow(i, 3 * (i / 3) + n))
+                for (uint16_t *gval : this->puzzle->uBlkValuesNotInRow(3 * (i / 3) + n, i))
                 {
                     *gval -= *gval & unique;
                 }
@@ -141,14 +143,14 @@ void Solver::squeeze(bool *updated)
         unique_bits = this->puzzle->uniqueBitsInSections(j, false);
 
         // Loop over each of the three sections of the col
-        for (int n = 0; n < 3; ++n)
+        for (uint32_t n = 0; n < 3; ++n)
         {
             unique = unique_bits.at(n);
 
             // If there are unique bits in a section, remove them from the non-col members of the blk
             if (unique != 0)
             {
-                for (uint16_t *gval : this->puzzle->uBlkValuesNotInCol(j, j / 3 + 3 * n))
+                for (uint16_t *gval : this->puzzle->uBlkValuesNotInCol(j / 3 + 3 * n, j))
                 {
                     *gval -= *gval & unique;
                 }
@@ -156,7 +158,11 @@ void Solver::squeeze(bool *updated)
         }
     }
 
+    // Update the unsolved and recently solved
     this->postStepUpdate();
+
+    // Track if we've made any update
+    *updated |= initial_unsolved != this->puzzle->numUnsolved();
 }
 
 void Solver::pipe(bool *updated)

@@ -206,7 +206,7 @@ std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index)
 {
     std::array<uint16_t *, 9> vals_in_row;
 
-    for (int n = 0; n < 9; ++n)
+    for (uint32_t n = 0; n < 9; ++n)
     {
         vals_in_row[n] = this->ptrValue(this->refIndicesInRow(row_index).at(n));
     }
@@ -218,7 +218,7 @@ std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index)
 {
     std::array<uint16_t *, 9> vals_in_col;
 
-    for (int n = 0; n < 9; ++n)
+    for (uint32_t n = 0; n < 9; ++n)
     {
         vals_in_col[n] = this->ptrValue(this->refIndicesInCol(col_index).at(n));
     }
@@ -230,7 +230,7 @@ std::array<uint16_t *, 9> Puzzle::ptrValuesInBlk(const uint32_t &blk_index)
 {
     std::array<uint16_t *, 9> vals_in_blk;
 
-    for (int n = 0; n < 9; ++n)
+    for (uint32_t n = 0; n < 9; ++n)
     {
         vals_in_blk[n] = this->ptrValue(this->refIndicesInBlk(blk_index).at(n));
     }
@@ -355,7 +355,7 @@ std::array<uint16_t, 3> Puzzle::uniqueBitsInSections(const uint32_t &row_or_col_
     uint16_t section_1_bits = 0;
     uint16_t section_2_bits = 0;
     uint16_t section_3_bits = 0;
-    for (int i = 0; i < 3; ++i)
+    for (uint32_t i = 0; i < 3; ++i)
     {
         section_1_bits |= *vals.at(i);
         section_2_bits |= *vals.at(i + 3);
@@ -515,7 +515,7 @@ void Puzzle::validPuzzle(bool *goodness)
 
 void Puzzle::printPuzzle()
 {
-    for (int i = 0; i < 81; ++i)
+    for (uint32_t i = 0; i < 81; ++i)
     {
         std::cout << std::setw(3) << this->getValue(i) << " ";
         if ((i + 1) % 9 == 0)
@@ -541,7 +541,7 @@ void Puzzle::printUnsolved()
 
 void Puzzle::printUGroup(const std::array<std::vector<uint32_t>, 9> &group)
 {
-    for (int i = 0; i < 9; ++i)
+    for (uint32_t i = 0; i < 9; ++i)
     {
         for (const uint32_t &elem : group.at(i))
         {
