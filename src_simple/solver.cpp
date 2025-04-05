@@ -123,10 +123,10 @@ void Solver::squeeze(bool *updated)
         {
             unique = unique_bits.at(n);
 
-            // If there are unique bits in a section, remove them from the non-row members of the blk
+            // If there are unique bits in a section, remove them from the unsolved non-row members of the blk
             if (unique != 0)
             {
-                for (uint16_t *gval : this->puzzle->blkValuesNotInRow(i, 3 * (i / 3) + n))
+                for (uint16_t *gval : this->puzzle->uBlkValuesNotInRow(i, 3 * (i / 3) + n))
                 {
                     *gval -= *gval & unique;
                 }
@@ -148,7 +148,7 @@ void Solver::squeeze(bool *updated)
             // If there are unique bits in a section, remove them from the non-col members of the blk
             if (unique != 0)
             {
-                for (uint16_t *gval : this->puzzle->blkValuesNotInCol(j, j / 3 + 3 * n))
+                for (uint16_t *gval : this->puzzle->uBlkValuesNotInCol(j, j / 3 + 3 * n))
                 {
                     *gval -= *gval & unique;
                 }

@@ -49,6 +49,7 @@ public:
     // Setting and getting the puzzle data
     void setValue(uint32_t index, uint16_t val);
     uint16_t getValue(uint32_t index);
+    uint16_t *ptrValue(const uint32_t &index);
     uint32_t numUnsolved();
 
     // Helpful functions related to indexing and index translation
@@ -67,11 +68,14 @@ public:
     std::array<uint32_t, 3> *ptrColInBlk(const uint32_t &blk_index);
     std::array<uint32_t, 3> *ptrBlkInRow(const uint32_t &row_index);
     std::array<uint32_t, 3> *ptrBlkInCol(const uint32_t &col_index);
+    const std::array<uint32_t, 9> &refRowInCol(const uint32_t &col_index);
+    const std::array<uint32_t, 9> &refColInRow(const uint32_t &row_index);
+    const std::array<uint32_t, 3> &refRowInBlk(const uint32_t &blk_index);
+    const std::array<uint32_t, 3> &refColInBlk(const uint32_t &blk_index);
+    const std::array<uint32_t, 3> &refBlkInRow(const uint32_t &row_index);
+    const std::array<uint32_t, 3> &refBlkInCol(const uint32_t &col_index);
 
     // Accessing slices of values
-    const std::array<uint16_t, 9> &getValuesInRow(const uint32_t &row_index);
-    const std::array<uint16_t, 9> &getValuesInCol(const uint32_t &col_index);
-    const std::array<uint16_t, 9> &getValuesInBlk(const uint32_t &blk_index);
     std::array<uint16_t *, 9> ptrValuesInRow(const uint32_t &row_index);
     std::array<uint16_t *, 9> ptrValuesInCol(const uint32_t &col_index);
     std::array<uint16_t *, 9> ptrValuesInBlk(const uint32_t &blk_index);
@@ -87,9 +91,9 @@ public:
     void strikeLatestFromPuzzle();
 
     // Squeeze functions
-    std::array<uint16_t, 3> uniqueBitsInSections(const uint32_t &row_index, bool is_row);
-    std::array<uint16_t *, 6> blkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index);
-    std::array<uint16_t *, 6> blkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index);
+    std::array<uint16_t, 3> uniqueBitsInSections(const uint32_t &row_or_col_index, bool is_row);
+    std::vector<uint16_t *> uBlkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index);
+    std::vector<uint16_t *> uBlkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index);
 
     // Bit operations
     uint16_t rowNeighborBits(const uint32_t &index);

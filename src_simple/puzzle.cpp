@@ -87,6 +87,11 @@ uint16_t Puzzle::getValue(uint32_t index)
     return data.at(index);
 }
 
+uint16_t *Puzzle::ptrValue(const uint32_t &index)
+{
+    return &data.at(index);
+}
+
 uint32_t Puzzle::numUnsolved()
 {
     return this->unsolved_indices.size();
@@ -167,17 +172,71 @@ std::array<uint32_t, 3> *Puzzle::ptrBlkInCol(const uint32_t &col_index)
     return const_cast<std::array<uint32_t, 3> *>(&col_to_blk->at(col_index));
 }
 
-const std::array<uint16_t, 9> &Puzzle::getValuesInRow(const uint32_t &row_index) {}
+const std::array<uint32_t, 9> &Puzzle::refRowInCol(const uint32_t &col_index)
+{
+    return col_to_row->at(col_index);
+}
 
-const std::array<uint16_t, 9> &Puzzle::getValuesInCol(const uint32_t &col_index) {}
+const std::array<uint32_t, 9> &Puzzle::refColInRow(const uint32_t &row_index)
+{
+    return row_to_col->at(row_index);
+}
 
-const std::array<uint16_t, 9> &Puzzle::getValuesInBlk(const uint32_t &blk_index) {}
+const std::array<uint32_t, 3> &Puzzle::refRowInBlk(const uint32_t &blk_index)
+{
+    return blk_to_row->at(blk_index);
+}
 
-std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index) {}
+const std::array<uint32_t, 3> &Puzzle::refColInBlk(const uint32_t &blk_index)
+{
+    return blk_to_col->at(blk_index);
+}
 
-std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index) {}
+const std::array<uint32_t, 3> &Puzzle::refBlkInRow(const uint32_t &row_index)
+{
+    return row_to_blk->at(row_index);
+}
 
-std::array<uint16_t *, 9> Puzzle::ptrValuesInBlk(const uint32_t &blk_index) {}
+const std::array<uint32_t, 3> &Puzzle::refBlkInCol(const uint32_t &col_index)
+{
+    return col_to_blk->at(col_index);
+}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index)
+{
+    std::array<uint16_t *, 9> vals_in_row;
+
+    for (int n = 0; n < 9; ++n)
+    {
+        vals_in_row[n] = this->ptrValue(this->refIndicesInRow(row_index).at(n));
+    }
+
+    return vals_in_row;
+}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index)
+{
+    std::array<uint16_t *, 9> vals_in_col;
+
+    for (int n = 0; n < 9; ++n)
+    {
+        vals_in_col[n] = this->ptrValue(this->refIndicesInCol(col_index).at(n));
+    }
+
+    return vals_in_col;
+}
+
+std::array<uint16_t *, 9> Puzzle::ptrValuesInBlk(const uint32_t &blk_index)
+{
+    std::array<uint16_t *, 9> vals_in_blk;
+
+    for (int n = 0; n < 9; ++n)
+    {
+        vals_in_blk[n] = this->ptrValue(this->refIndicesInBlk(blk_index).at(n));
+    }
+
+    return vals_in_blk;
+}
 
 /**
  * @brief
@@ -311,9 +370,59 @@ std::array<uint16_t, 3> Puzzle::uniqueBitsInSections(const uint32_t &row_or_col_
     return {section_1_unq, section_2_unq, section_3_unq};
 }
 
-std::array<uint16_t *, 6> Puzzle::blkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index) {}
+/**
+ * @brief Returns the unsolved puzzle values in a given block that are not in the specified row.
+ *
+ * @param blk_index
+ * @param row_index
+ * @return std::vector<uint16_t *>
+ */
+std::vector<uint16_t *> Puzzle::uBlkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index)
+{
+    std::vector<uint16_t *> not_in_row;
 
-std::array<uint16_t *, 6> Puzzle::blkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index) {}
+    // Loop over unsolved elements of the block
+    for (const uint32_t &flat_idx : this->blk_u_groups.at(blk_index))
+    {
+        // The row index of this element
+        const uint32_t &i = this->refRowIndex(flat_idx);
+
+        // If this row isn't the one we're trying to avoid, add it to the list
+        if (i != row_index)
+        {
+            not_in_row.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return not_in_row;
+}
+
+/**
+ * @brief Returns the unsolved puzzle values in a given block that are not in the specified column.
+ *
+ * @param blk_index
+ * @param col_index
+ * @return std::vector<uint16_t *>
+ */
+std::vector<uint16_t *> Puzzle::uBlkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index)
+{
+    std::vector<uint16_t *> not_in_col;
+
+    // Loop over unsolved elements of the block
+    for (const uint32_t &flat_idx : this->blk_u_groups.at(blk_index))
+    {
+        // The col index of this element
+        const uint32_t &i = this->refColIndex(flat_idx);
+
+        // If this col isn't the one we're trying to avoid, add the puzzle value
+        if (i != col_index)
+        {
+            not_in_col.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return not_in_col;
+}
 
 uint16_t Puzzle::rowNeighborBits(const uint32_t &index)
 {
