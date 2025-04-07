@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.29)
 project(sudoFun)
 
-file(GLOB SOURCES "src_simple/*.cpp")
-file(GLOB HEADERS "src_simple/*.hpp")
+file(GLOB SOURCES "src/*.cpp")
+file(GLOB HEADERS "src/*.hpp")
 
 if(NOT SOURCES)
     message(FATAL_ERROR "No source files found in src/")

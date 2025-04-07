@@ -1,6 +1,6 @@
 
-#ifndef SOLVER_CLASS_HEADER
-#define SOLVER_CLASS_HEADER
+#ifndef SUDOFUN_SOLVER_CLASS_HEADER
+#define SUDOFUN_SOLVER_CLASS_HEADER
 
 #include "puzzle.hpp"
 
@@ -8,10 +8,11 @@ class Solver
 {
 private:
     Puzzle *puzzle;
-    int attempts;
+    int total_loops;
+    int guesses;
 
 public:
-    Solver(Puzzle *puzzle) : puzzle(puzzle), attempts(0) {}
+    Solver(Puzzle *puzzle) : puzzle(puzzle), total_loops(0), guesses(0) {}
 
     // Solver rules
     void strike(bool *updated);
@@ -25,6 +26,12 @@ public:
     // An iterative deterministic solver loop
     void reduceLoop();
     void reduceLoop(bool *goodness);
+
+    // Guesser solver
+    void guessAndCheck();
+
+    // 
+    void solve(int max_guesses = 100);
 };
 
 #endif

@@ -1,6 +1,6 @@
 
-#ifndef CLUE_CLASS_HEADER
-#define CLUE_CLASS_HEADER
+#ifndef SUDOFUN_CLUE_CLASS_HEADER
+#define SUDOFUN_CLUE_CLASS_HEADER
 
 #include <string>
 #include <iterator>
