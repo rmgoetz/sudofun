@@ -3,7 +3,6 @@ from setuptools import setup
 setup(name='sudofun',
       version='0.1',
       description='A package for sudoku tools',
-      long_description=open('README.txt').read(),
       install_requires=[],
       classifiers=[
             'Development Status :: 1 - Planning',
