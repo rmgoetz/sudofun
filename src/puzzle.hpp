@@ -4,11 +4,7 @@
 
 #include "clue.hpp"
 #include "maps.hpp"
-#include <array>
-#include <vector>
 #include <tuple>
-#include <stdint.h>
-#include <unordered_map>
 
 class Puzzle
 {
@@ -103,9 +99,9 @@ public:
 
 
     // Bit operations
-    uint16_t rowNeighborBits(const uint32_t &index);
-    uint16_t colNeighborBits(const uint32_t &index);
-    uint16_t blkNeighborBits(const uint32_t &index);
+    uint16_t rowNeighborBits(const uint32_t &flat_index);
+    uint16_t colNeighborBits(const uint32_t &flat_index);
+    uint16_t blkNeighborBits(const uint32_t &flat_index);
     std::tuple<uint32_t, uint32_t, std::vector<uint32_t>> leastPopularBit();
 
     // Updating the solved and unsolved indices tracker
