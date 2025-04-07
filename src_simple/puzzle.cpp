@@ -424,6 +424,96 @@ std::vector<uint16_t *> Puzzle::uBlkValuesNotInCol(const uint32_t &blk_index, co
     return not_in_col;
 }
 
+std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesSiftRow(const uint32_t &blk_index, const uint32_t &row_index)
+{
+    std::vector<uint16_t *> in_row;
+    std::vector<uint16_t *> not_in_row;
+
+    // Loop over unsolved elements of the block
+    for (const uint32_t &flat_idx : this->blk_u_groups.at(blk_index))
+    {
+        // The col index of this element
+        const uint32_t &i = this->refRowIndex(flat_idx);
+
+        // Separate elements based on row inclusion
+        if (i == row_index)
+        {
+            in_row.push_back(this->ptrValue(flat_idx));
+        }
+        else
+        {
+            not_in_row.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return {in_row, not_in_row};
+}
+
+std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesSiftCol(const uint32_t &blk_index, const uint32_t &col_index)
+{
+    std::vector<uint16_t *> in_col;
+    std::vector<uint16_t *> not_in_col;
+
+    // Loop over unsolved elements of the block
+    for (const uint32_t &flat_idx : this->blk_u_groups.at(blk_index))
+    {
+        // The col index of this element
+        const uint32_t &i = this->refColIndex(flat_idx);
+
+        // Separate elements based on col inclusion
+        if (i == col_index)
+        {
+            in_col.push_back(this->ptrValue(flat_idx));
+        }
+        else
+        {
+            not_in_col.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return {in_col, not_in_col};
+}
+
+std::vector<uint16_t *> Puzzle::uRowValuesNotInBlk(const uint32_t &row_index, const uint32_t &blk_index)
+{
+    std::vector<uint16_t *> not_in_blk;
+
+    // Loop over unsolved elements of the row
+    for (const uint32_t &flat_idx : this->row_u_groups.at(row_index))
+    {
+        // The blk index of this element
+        const uint32_t &g = this->refBlkIndex(flat_idx);
+
+        // Add if the element is not in the blk
+        if (g != blk_index)
+        {
+            not_in_blk.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return not_in_blk;
+}
+
+std::vector<uint16_t *> Puzzle::uColValuesNotInBlk(const uint32_t &col_index, const uint32_t &blk_index)
+{
+    std::vector<uint16_t *> not_in_blk;
+
+    // Loop over unsolved elements of the col
+    for (const uint32_t &flat_idx : this->col_u_groups.at(col_index))
+    {
+        // The blk index of this element
+        const uint32_t &g = this->refBlkIndex(flat_idx);
+
+        // Add if the element is not in the blk
+        if (g != blk_index)
+        {
+            not_in_blk.push_back(this->ptrValue(flat_idx));
+        }
+    }
+
+    return not_in_blk
+}
+
 uint16_t Puzzle::rowNeighborBits(const uint32_t &index)
 {
     uint16_t neighbor_bits = 0;

@@ -95,6 +95,13 @@ public:
     std::vector<uint16_t *> uBlkValuesNotInRow(const uint32_t &blk_index, const uint32_t &row_index);
     std::vector<uint16_t *> uBlkValuesNotInCol(const uint32_t &blk_index, const uint32_t &col_index);
 
+    // Pipe functions
+    std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> uBlkValuesSiftRow(const uint32_t &blk_index, const uint32_t &row_index);
+    std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> uBlkValuesSiftCol(const uint32_t &blk_index, const uint32_t &col_index);
+    std::vector<uint16_t *> uRowValuesNotInBlk(const uint32_t &row_index, const uint32_t &blk_index);
+    std::vector<uint16_t *> uColValuesNotInBlk(const uint32_t &col_index, const uint32_t &blk_index);
+
+
     // Bit operations
     uint16_t rowNeighborBits(const uint32_t &index);
     uint16_t colNeighborBits(const uint32_t &index);

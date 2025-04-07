@@ -10,8 +10,8 @@ namespace utils
 
 	/**
 	 * @brief Counts the number of active/hot bits in a number less than or equal to 511.
-	 * 
-	 * @param n 
+	 *
+	 * @param n
 	 * @return uint16_t The number of nonzero bits in the binary representation of the input
 	 */
 	uint16_t countBits(uint16_t n)
@@ -42,5 +42,35 @@ namespace utils
 		binary_string.replace(9 - val, 1, "1");
 
 		return static_cast<uint16_t>(std::stoi(binary_string, nullptr, 2));
+	}
+
+	/**
+	 * @brief
+	 *
+	 * @param src
+	 * @param ref
+	 * @return uint16_t
+	 */
+	uint16_t bitsInSrcNotInRef(std::vector<uint16_t *> src, std::vector<uint16_t *> ref)
+	{
+		uint16_t src_bits = 0;
+		uint16_t ref_bits = 0;
+
+		// Identify all active bits in source
+		for (uint16_t *src_ptr : src)
+		{
+			src_bits |= *src_ptr;
+		}
+
+		// Identify all active bits in reference
+		for (uint16_t *ref_ptr : ref)
+		{
+			ref_bits |= *ref_ptr;
+		}
+
+		// Determine which are unique to source
+		src_bits = src_bits & (ref_bits ^ 511);
+
+		return src_bits;
 	}
 } // namespace utils

@@ -1,5 +1,6 @@
 
 #include "solver.hpp"
+#include "utils.hpp"
 
 void Solver::strike(bool *updated)
 {
@@ -165,13 +166,55 @@ void Solver::squeeze(bool *updated)
     *updated |= initial_unsolved != this->puzzle->numUnsolved();
 }
 
+/**
+ * @brief In every block select the unsolved elements and check if any bit is unique to a row or column within
+ * the block. For each unique bit eliminate them from row/column members outside if the block.
+ *
+ * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
+ */
 void Solver::pipe(bool *updated)
 {
+    uint32_t initial_unsolved = this->puzzle->numUnsolved();
+
+    // Loop over the blocks
     for (uint32_t g = 0; g < 9; ++g)
     {
+        // Loop over the rows/cols of the block
+        for (uint32_t n = 0; n < 9; ++n)
+        {
+            // Grab the unsolved elements of the block, split into which are part of the row/col, and which are not
+            auto [blk_in_row, blk_not_in_row] = this->puzzle->uBlkValuesSiftRow(g, n);
+            auto [blk_in_col, blk_not_in_col] = this->puzzle->uBlkValuesSiftCol(g, n);
+
+            // Determine if there are any unique bits of those block members in the row/col
+            uint16_t unique_row_bits = utils::bitsInSrcNotInRef(blk_in_row, blk_not_in_row);
+            uint16_t unique_col_bits = utils::bitsInSrcNotInRef(blk_in_col, blk_not_in_col);
+
+            // Remove those bits from non-block row/col members
+            if (unique_row_bits != 0)
+            {
+                for (uint16_t *gval : this->puzzle->uRowValuesNotInBlk(n, g))
+                {
+                    *gval -= *gval & unique_row_bits;
+                }
+            }
+            if (unique_col_bits != 0)
+            {
+                for (uint16_t *gval : this->puzzle->uColValuesNotInBlk(n, g))
+                {
+                    *gval -= *gval & unique_col_bits;
+                }
+            }
+        }
+
+        // Loop over the columns of the block
     }
 
+    // Update the unsolved and recently solved
     this->postStepUpdate();
+
+    // Track if we've made any update
+    *updated |= initial_unsolved != this->puzzle->numUnsolved();
 }
 
 void Solver::solveStack(bool *updated)
