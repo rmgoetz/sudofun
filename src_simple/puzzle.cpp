@@ -511,7 +511,7 @@ std::vector<uint16_t *> Puzzle::uColValuesNotInBlk(const uint32_t &col_index, co
         }
     }
 
-    return not_in_blk
+    return not_in_blk;
 }
 
 uint16_t Puzzle::rowNeighborBits(const uint32_t &index)

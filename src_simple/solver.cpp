@@ -2,6 +2,12 @@
 #include "solver.hpp"
 #include "utils.hpp"
 
+/**
+ * @brief Run through the most recently solved values and remove the corresponding bits from the rest of
+ * their row, column, and block.
+ *
+ * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
+ */
 void Solver::strike(bool *updated)
 {
     bool is_done = false;
@@ -249,6 +255,9 @@ void Solver::reduceLoop()
         // Track the number of loop attempts we've made
         this->total_loops++;
     }
+
+    // Run one more strike for cleanup after the loop
+    strike(&keep_going);
 }
 
 void Solver::reduceLoop(bool *goodness)
@@ -267,6 +276,9 @@ void Solver::reduceLoop(bool *goodness)
         this->puzzle->validPuzzle(goodness);
         keep_going &= *goodness;
     }
+
+    // Run one more strike for cleanup after the loop
+    strike(&keep_going);
 }
 
 void Solver::guessAndCheck()
