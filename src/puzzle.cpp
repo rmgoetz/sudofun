@@ -94,56 +94,113 @@ uint16_t *Puzzle::ptrValue(const uint32_t &index)
     return &data.at(index);
 }
 
+/**
+ * @brief Returns the number of still unsolved elements of the puzzle.
+ * 
+ * @return uint32_t 
+ */
 uint32_t Puzzle::numUnsolved()
 {
     return this->unsolved_indices.size();
 }
 
+/**
+ * @brief Returns the row index of the element located at a given flat index.
+ * 
+ * @param flat_index 
+ * @return const uint32_t& 
+ */
 const uint32_t &Puzzle::refRowIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(0);
 }
 
+/**
+ * @brief Returns the column index of the element located at a given flat index.
+ * 
+ * @param flat_index 
+ * @return const uint32_t& 
+ */
 const uint32_t &Puzzle::refColIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(1);
 }
 
+/**
+ * @brief Returns the block index of the element located at a given flat index.
+ * 
+ * @param flat_index 
+ * @return const uint32_t& 
+ */
 const uint32_t &Puzzle::refBlkIndex(const uint32_t &flat_index)
 {
     return this->flat_to_row_col_block->at(flat_index).at(2);
 }
 
+/**
+ * @brief Returns the flat indices of all members of a given row.
+ * 
+ * @param row_index 
+ * @return const std::array<uint32_t, 9>& 
+ */
 const std::array<uint32_t, 9> &Puzzle::refIndicesInRow(const uint32_t &row_index)
 {
     return row_to_flat->at(row_index);
 }
 
+/**
+ * @brief Returns the flat indices of all members of a given column.
+ * 
+ * @param col_index 
+ * @return const std::array<uint32_t, 9>& 
+ */
 const std::array<uint32_t, 9> &Puzzle::refIndicesInCol(const uint32_t &col_index)
 {
     return col_to_flat->at(col_index);
 }
 
-const std::array<uint32_t, 9> &Puzzle::refIndicesInBlk(const uint32_t &blk_index)
-{
-    return blk_to_flat->at(blk_index);
-}
-
+/**
+ * @brief Returns the flat indices of the unsolved elements in the same row as a given
+ * flat index.
+ * 
+ * @param flat_idx 
+ * @return std::vector<uint32_t>* 
+ */
 std::vector<uint32_t> *Puzzle::ptrRowUGroup(const uint32_t &flat_idx)
 {
     return &this->row_u_groups.at(this->refRowIndex(flat_idx));
 }
 
+/**
+ * @brief Returns the flat indices of the unsolved elements in the same column as a given
+ * flat index.
+ * 
+ * @param flat_idx 
+ * @return std::vector<uint32_t>* 
+ */
 std::vector<uint32_t> *Puzzle::ptrColUGroup(const uint32_t &flat_idx)
 {
     return &this->col_u_groups.at(this->refColIndex(flat_idx));
 }
 
+/**
+ * @brief Returns the flat indices of the unsolved elements in the same block as a given
+ * flat index.
+ * 
+ * @param flat_idx 
+ * @return std::vector<uint32_t>* 
+ */
 std::vector<uint32_t> *Puzzle::ptrBlkUGroup(const uint32_t &flat_idx)
 {
     return &this->blk_u_groups.at(this->refBlkIndex(flat_idx));
 }
 
+/**
+ * @brief Returns pointers to the values of each element of a given row.
+ * 
+ * @param row_index 
+ * @return std::array<uint16_t *, 9> 
+ */
 std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index)
 {
     std::array<uint16_t *, 9> vals_in_row;
@@ -156,6 +213,12 @@ std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index)
     return vals_in_row;
 }
 
+/**
+ * @brief Returns pointers to the values of each element of a given column.
+ * 
+ * @param col_index 
+ * @return std::array<uint16_t *, 9> 
+ */
 std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index)
 {
     std::array<uint16_t *, 9> vals_in_col;
@@ -188,6 +251,11 @@ void removeFromGroup(std::vector<uint32_t> *group, const uint32_t &cut_index)
     }
 }
 
+/**
+ * @brief Removes a given flat index from the unsolved groups
+ * 
+ * @param cut_index 
+ */
 void Puzzle::removeFromUGroups(const uint32_t &cut_index)
 {
     // Convert to row, col, and blk indices
@@ -202,6 +270,11 @@ void Puzzle::removeFromUGroups(const uint32_t &cut_index)
     removeFromGroup(&this->blk_u_groups.at(blk_idx), cut_index);
 }
 
+/**
+ * @brief Removes a group of flat indices from the unsolved groups.
+ * 
+ * @param cut_vector 
+ */
 void Puzzle::removeFromUGroups(const std::vector<uint32_t> &cut_vector)
 {
     for (const uint32_t &cut_index : cut_vector)
@@ -274,6 +347,14 @@ void Puzzle::strikeLatestFromPuzzle()
     this->strikeFromPuzzle(this->latest_solved_indices);
 }
 
+/**
+ * @brief Divide every row or column into three sections according to block membership, and identify bits
+ * which are unique to any particular section of the row/column.
+ * 
+ * @param row_or_col_index 
+ * @param is_row 
+ * @return std::array<uint16_t, 3> 
+ */
 std::array<uint16_t, 3> Puzzle::uniqueBitsInSections(const uint32_t &row_or_col_index, bool is_row)
 {
     // Puzzle values in the row or column
@@ -361,6 +442,14 @@ std::vector<uint16_t *> Puzzle::uBlkValuesNotInCol(const uint32_t &blk_index, co
     return not_in_col;
 }
 
+/**
+ * @brief Sort all of the unsolved elements of a given block into two groups: those included in a given row, and
+ * those not.
+ * 
+ * @param blk_index 
+ * @param row_index 
+ * @return std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> 
+ */
 std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesSiftRow(const uint32_t &blk_index, const uint32_t &row_index)
 {
     std::vector<uint16_t *> in_row;
@@ -386,6 +475,14 @@ std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesS
     return {in_row, not_in_row};
 }
 
+/**
+ * @brief Sort all of the unsolved elements of a given block into two groups: those included in a given column, and
+ * those not.
+ * 
+ * @param blk_index 
+ * @param col_index 
+ * @return std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> 
+ */
 std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesSiftCol(const uint32_t &blk_index, const uint32_t &col_index)
 {
     std::vector<uint16_t *> in_col;
@@ -411,6 +508,13 @@ std::tuple<std::vector<uint16_t *>, std::vector<uint16_t *>> Puzzle::uBlkValuesS
     return {in_col, not_in_col};
 }
 
+/**
+ * @brief Return all of the values for unsolved elements in a given row which are not in a given block.
+ * 
+ * @param row_index 
+ * @param blk_index 
+ * @return std::vector<uint16_t *> 
+ */
 std::vector<uint16_t *> Puzzle::uRowValuesNotInBlk(const uint32_t &row_index, const uint32_t &blk_index)
 {
     std::vector<uint16_t *> not_in_blk;
@@ -431,6 +535,13 @@ std::vector<uint16_t *> Puzzle::uRowValuesNotInBlk(const uint32_t &row_index, co
     return not_in_blk;
 }
 
+/**
+ * @brief Return all of the values for unsolved elements in a given column which are not in a given block.
+ * 
+ * @param col_index 
+ * @param blk_index 
+ * @return std::vector<uint16_t *> 
+ */
 std::vector<uint16_t *> Puzzle::uColValuesNotInBlk(const uint32_t &col_index, const uint32_t &blk_index)
 {
     std::vector<uint16_t *> not_in_blk;
@@ -522,6 +633,11 @@ void Puzzle::resetSolvedIndices()
     this->latest_solved_indices.clear();
 }
 
+/**
+ * @brief Looks over the unsolved indices to see whether any are actually solved. If one is solved,
+ * remove it from the unsolved indices and add it to the recently solved indices.
+ * 
+ */
 void Puzzle::checkUnsolved()
 {
     // Check which flat indices have been solved and put them into the latest solved vector
@@ -598,6 +714,11 @@ std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> Puzzle::le
     return {bits_v, loc_v};
 }
 
+/**
+ * @brief Determines whether a puzzle is still valid by checking whether any entry has value 0.
+ * 
+ * @param goodness 
+ */
 void Puzzle::validPuzzle(bool *goodness)
 {
     for (const uint16_t &val : this->data)

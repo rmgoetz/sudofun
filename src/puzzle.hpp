@@ -57,7 +57,6 @@ public:
     const uint32_t &refBlkIndex(const uint32_t &flat_index);
     const std::array<uint32_t, 9> &refIndicesInRow(const uint32_t &row_index);
     const std::array<uint32_t, 9> &refIndicesInCol(const uint32_t &col_index);
-    const std::array<uint32_t, 9> &refIndicesInBlk(const uint32_t &blk_index);
     std::vector<uint32_t> *ptrRowUGroup(const uint32_t &flat_idx);
     std::vector<uint32_t> *ptrColUGroup(const uint32_t &flat_idx);
     std::vector<uint32_t> *ptrBlkUGroup(const uint32_t &flat_idx);

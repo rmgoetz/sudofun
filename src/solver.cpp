@@ -2,8 +2,6 @@
 #include "solver.hpp"
 #include "puzzle.hpp"
 #include "utils.hpp"
-#include <stdint.h>
-
 
 /**
  * @brief Run through the most recently solved values and remove the corresponding bits from the rest of
@@ -316,7 +314,6 @@ void Solver::guessAndCheck()
                 // Run another reduce loop on our true puzzle to squeeze out any benefits of this elimination
                 this->reduceLoop(this->puzzle);
             }
-
 
             // Increment the number of guesses we've made
             this->guesses++;
