@@ -31,7 +31,7 @@ namespace utils
 	 * @param val - An integer value from 1 to 9 inclusive.
 	 * @return uint16_t
 	 */
-	uint16_t valueToNineBit(uint8_t val)
+	uint16_t valueToNineBit(uint32_t val)
 	{
 		if ((val < 1) && (val > 9))
 		{
@@ -42,6 +42,39 @@ namespace utils
 		binary_string.replace(9 - val, 1, "1");
 
 		return static_cast<uint16_t>(std::stoi(binary_string, nullptr, 2));
+	}
+
+	/**
+	 * @brief Convert a 9 bit value back to a sudoku cell value (1-9 inclusive). Non-solved cells are 0.
+	 * 
+	 * @param nb The nine bit value
+	 * @return uint16_t 
+	 */
+	uint16_t nineBitToValue(uint16_t nb)
+	{
+		// Just use a switch instead of doing arithmetic
+		switch (nb)
+		{
+		case 1:
+			return 1;
+		case 2:
+			return 2;
+		case 4:
+			return 3;
+		case 8:
+			return 4;
+		case 16:
+			return 5;
+		case 32:
+			return 6;
+		case 64:
+			return 7;
+		case 128:
+			return 8;
+		case 256:
+			return 9;
+		}
+		return 0;
 	}
 
 	/**

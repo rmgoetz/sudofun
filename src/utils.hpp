@@ -8,7 +8,9 @@ namespace utils
 {
     uint16_t countBits(uint16_t n);
 
-    uint16_t valueToNineBit(uint8_t val);
+    uint16_t valueToNineBit(uint32_t val);
+
+    uint16_t nineBitToValue(uint16_t nb);
 
     uint16_t bitsInSrcNotInRef(std::vector<uint16_t *> src, std::vector<uint16_t *> ref);
 }

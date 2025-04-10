@@ -2,9 +2,12 @@
 #ifndef SUDOFUN_PUZZLE_CLASS_HEADER
 #define SUDOFUN_PUZZLE_CLASS_HEADER
 
-#include "clue.hpp"
-#include "maps.hpp"
-#include <tuple>
+#include <array>
+#include <vector>
+#include <stdint.h>
+
+// Forward declare clue
+class Clue;
 
 class Puzzle
 {
@@ -39,7 +42,7 @@ public:
     // Constructor
     Puzzle();
 
-    // Update from default puzzle with
+    // Update from default puzzle with a clue
     void addClueString(Clue *clue);
 
     // Setting and getting the puzzle data
@@ -58,23 +61,10 @@ public:
     std::vector<uint32_t> *ptrRowUGroup(const uint32_t &flat_idx);
     std::vector<uint32_t> *ptrColUGroup(const uint32_t &flat_idx);
     std::vector<uint32_t> *ptrBlkUGroup(const uint32_t &flat_idx);
-    std::array<uint32_t, 9> *ptrRowInCol(const uint32_t &col_index);
-    std::array<uint32_t, 9> *ptrColInRow(const uint32_t &row_index);
-    std::array<uint32_t, 3> *ptrRowInBlk(const uint32_t &blk_index);
-    std::array<uint32_t, 3> *ptrColInBlk(const uint32_t &blk_index);
-    std::array<uint32_t, 3> *ptrBlkInRow(const uint32_t &row_index);
-    std::array<uint32_t, 3> *ptrBlkInCol(const uint32_t &col_index);
-    const std::array<uint32_t, 9> &refRowInCol(const uint32_t &col_index);
-    const std::array<uint32_t, 9> &refColInRow(const uint32_t &row_index);
-    const std::array<uint32_t, 3> &refRowInBlk(const uint32_t &blk_index);
-    const std::array<uint32_t, 3> &refColInBlk(const uint32_t &blk_index);
-    const std::array<uint32_t, 3> &refBlkInRow(const uint32_t &row_index);
-    const std::array<uint32_t, 3> &refBlkInCol(const uint32_t &col_index);
 
     // Accessing slices of values
     std::array<uint16_t *, 9> ptrValuesInRow(const uint32_t &row_index);
     std::array<uint16_t *, 9> ptrValuesInCol(const uint32_t &col_index);
-    std::array<uint16_t *, 9> ptrValuesInBlk(const uint32_t &blk_index);
 
     // Methods to remove indices or vectors of indices from the unsolved row/col/blk groups
     void removeFromUGroups(const uint32_t &cut_index);
@@ -97,12 +87,11 @@ public:
     std::vector<uint16_t *> uRowValuesNotInBlk(const uint32_t &row_index, const uint32_t &blk_index);
     std::vector<uint16_t *> uColValuesNotInBlk(const uint32_t &col_index, const uint32_t &blk_index);
 
-
     // Bit operations
     uint16_t rowNeighborBits(const uint32_t &flat_index);
     uint16_t colNeighborBits(const uint32_t &flat_index);
     uint16_t blkNeighborBits(const uint32_t &flat_index);
-    std::tuple<uint32_t, uint32_t, std::vector<uint32_t>> leastPopularBit();
+    std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> leastPopularBit();
 
     // Updating the solved and unsolved indices tracker
     void resetSolvedIndices();
@@ -112,7 +101,8 @@ public:
 
     void validPuzzle(bool *goodness);
 
-    void printPuzzle();
+    // Printing functions
+    void printPuzzle(bool nine_bit = true);
     void printUnsolved();
     void printUGroup(const std::array<std::vector<uint32_t>, 9> &group);
     void printRowMap();

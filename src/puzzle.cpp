@@ -1,9 +1,11 @@
 
 #include "puzzle.hpp"
+#include "clue.hpp"
+#include "maps.hpp"
 #include "utils.hpp"
 #include <iostream>
 #include <iomanip>
-#include <stdio.h>
+#include <algorithm>
 
 // Static class members
 const std::array<std::array<uint32_t, 3>, 81> *Puzzle::flat_to_row_col_block = &FLAT_TO_ROW_COL_BLK;
@@ -142,66 +144,6 @@ std::vector<uint32_t> *Puzzle::ptrBlkUGroup(const uint32_t &flat_idx)
     return &this->blk_u_groups.at(this->refBlkIndex(flat_idx));
 }
 
-std::array<uint32_t, 9> *Puzzle::ptrRowInCol(const uint32_t &col_index)
-{
-    return const_cast<std::array<uint32_t, 9> *>(&col_to_row->at(col_index));
-}
-
-std::array<uint32_t, 9> *Puzzle::ptrColInRow(const uint32_t &row_index)
-{
-    return const_cast<std::array<uint32_t, 9> *>(&row_to_col->at(row_index));
-}
-
-std::array<uint32_t, 3> *Puzzle::ptrRowInBlk(const uint32_t &blk_index)
-{
-    return const_cast<std::array<uint32_t, 3> *>(&blk_to_row->at(blk_index));
-}
-
-std::array<uint32_t, 3> *Puzzle::ptrColInBlk(const uint32_t &blk_index)
-{
-    return const_cast<std::array<uint32_t, 3> *>(&blk_to_col->at(blk_index));
-}
-
-std::array<uint32_t, 3> *Puzzle::ptrBlkInRow(const uint32_t &row_index)
-{
-    return const_cast<std::array<uint32_t, 3> *>(&row_to_blk->at(row_index));
-}
-
-std::array<uint32_t, 3> *Puzzle::ptrBlkInCol(const uint32_t &col_index)
-{
-    return const_cast<std::array<uint32_t, 3> *>(&col_to_blk->at(col_index));
-}
-
-const std::array<uint32_t, 9> &Puzzle::refRowInCol(const uint32_t &col_index)
-{
-    return col_to_row->at(col_index);
-}
-
-const std::array<uint32_t, 9> &Puzzle::refColInRow(const uint32_t &row_index)
-{
-    return row_to_col->at(row_index);
-}
-
-const std::array<uint32_t, 3> &Puzzle::refRowInBlk(const uint32_t &blk_index)
-{
-    return blk_to_row->at(blk_index);
-}
-
-const std::array<uint32_t, 3> &Puzzle::refColInBlk(const uint32_t &blk_index)
-{
-    return blk_to_col->at(blk_index);
-}
-
-const std::array<uint32_t, 3> &Puzzle::refBlkInRow(const uint32_t &row_index)
-{
-    return row_to_blk->at(row_index);
-}
-
-const std::array<uint32_t, 3> &Puzzle::refBlkInCol(const uint32_t &col_index)
-{
-    return col_to_blk->at(col_index);
-}
-
 std::array<uint16_t *, 9> Puzzle::ptrValuesInRow(const uint32_t &row_index)
 {
     std::array<uint16_t *, 9> vals_in_row;
@@ -224,18 +166,6 @@ std::array<uint16_t *, 9> Puzzle::ptrValuesInCol(const uint32_t &col_index)
     }
 
     return vals_in_col;
-}
-
-std::array<uint16_t *, 9> Puzzle::ptrValuesInBlk(const uint32_t &blk_index)
-{
-    std::array<uint16_t *, 9> vals_in_blk;
-
-    for (uint32_t n = 0; n < 9; ++n)
-    {
-        vals_in_blk[n] = this->ptrValue(this->refIndicesInBlk(blk_index).at(n));
-    }
-
-    return vals_in_blk;
 }
 
 /**
@@ -281,8 +211,8 @@ void Puzzle::removeFromUGroups(const std::vector<uint32_t> &cut_vector)
 }
 
 /**
- * @brief Strikes a value from all members of the group except at the strike index. 
- * 
+ * @brief Strikes a value from all members of the group except at the strike index.
+ *
  * @param group One of the unsolved row, column, or block groups for a specific index
  * @param strike_idx The index of the value being struck from the group
  * @param strike_val The value to remove from the group
@@ -524,9 +454,9 @@ std::vector<uint16_t *> Puzzle::uColValuesNotInBlk(const uint32_t &col_index, co
 /**
  * @brief Retrieves all bits in the unsolved row neighbors of an element
  * with a specified flat index.
- * 
- * @param flat_index 
- * @return uint16_t 
+ *
+ * @param flat_index
+ * @return uint16_t
  */
 uint16_t Puzzle::rowNeighborBits(const uint32_t &flat_index)
 {
@@ -546,9 +476,9 @@ uint16_t Puzzle::rowNeighborBits(const uint32_t &flat_index)
 /**
  * @brief Retrieves all bits in the unsolved column neighbors of an element
  * with a specified flat index.
- * 
- * @param flat_index 
- * @return uint16_t 
+ *
+ * @param flat_index
+ * @return uint16_t
  */
 uint16_t Puzzle::colNeighborBits(const uint32_t &flat_index)
 {
@@ -568,9 +498,9 @@ uint16_t Puzzle::colNeighborBits(const uint32_t &flat_index)
 /**
  * @brief Retrieves all bits in the unsolved block neighbors of an element
  * with a specified flat index.
- * 
- * @param flat_index 
- * @return uint16_t 
+ *
+ * @param flat_index
+ * @return uint16_t
  */
 uint16_t Puzzle::blkNeighborBits(const uint32_t &flat_index)
 {
@@ -621,21 +551,76 @@ void Puzzle::checkUnsolved()
 /**
  * @brief
  *
- * @return std::tuple<uint32_t, uint32_t, std::vector<uint32_t>> The bit index, multiplicity
+ * @return std::tuple<std::vector<uint16_t>, std::vector<uint32_t>, std::vector<uint32_t>> The bit index, multiplicity, and locations in the puzzle
  */
-std::tuple<uint32_t, uint32_t, std::vector<uint32_t>> Puzzle::leastPopularBit()
+std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> Puzzle::leastPopularBit()
 {
+    std::array<uint16_t, 9> bits;
+    std::array<uint32_t, 9> multiplicity;
+    std::array<std::vector<uint32_t>, 9> locations;
+
+    // Count bit multiplicity for each bit amongst the unsolved elements
+    for (const uint32_t &unsolved_idx : this->unsolved_indices)
+    {
+        for (uint16_t i = 0; i < 9; ++i)
+        {
+            bits[i] = 1 << i;
+
+            if (this->getValue(unsolved_idx) & 1 << i != 0)
+            {
+                multiplicity[i]++;
+                locations[i].push_back(unsolved_idx);
+            }
+        }
+    }
+
+    // Sort the bits and locations by multiplicity, and then multiplicity itself
+    std::sort(bits.begin(), bits.end(), [&](uint16_t a, uint16_t b)
+              { return multiplicity[a] < multiplicity[b]; });
+    std::sort(locations.begin(), locations.end(), [&](std::vector<uint32_t> a, std::vector<uint32_t> b)
+              { uint32_t a_index = std::find(locations.begin(), locations.end(), a) - locations.begin();
+                uint32_t b_index = std::find(locations.begin(), locations.end(), b) - locations.begin();
+                return multiplicity.at(a_index) < multiplicity.at(b_index); });
+    std::sort(multiplicity.begin(), multiplicity.end(), std::greater<uint32_t>());
+
+    // We want to remove anything with multiplicity of zero
+    std::vector<uint16_t> bits_v;
+    std::vector<std::vector<uint32_t>> loc_v;
+    for (uint32_t i = 0; i < 9; ++i)
+    {
+        if (multiplicity[i] > 0)
+        {
+            bits_v.push_back(bits[i]);
+            loc_v.push_back(locations[i]);
+        }
+    }
+
+    return {bits_v, loc_v};
 }
 
 void Puzzle::validPuzzle(bool *goodness)
 {
+    for (const uint16_t &val : this->data)
+    {
+        if (val == 0)
+        {
+            *goodness = false;
+        }
+    }
 }
 
-void Puzzle::printPuzzle()
+void Puzzle::printPuzzle(bool nine_bit)
 {
     for (uint32_t i = 0; i < 81; ++i)
     {
-        std::cout << std::setw(3) << this->getValue(i) << " ";
+        if (nine_bit)
+        {
+            std::cout << std::setw(3) << this->getValue(i) << " ";
+        }
+        else
+        {
+            std::cout << std::setw(3) << utils::nineBitToValue(this->getValue(i)) << " ";
+        }
         if ((i + 1) % 9 == 0)
         {
             std::cout << std::endl;

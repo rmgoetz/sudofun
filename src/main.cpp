@@ -83,6 +83,8 @@ int main()
 
     std::cout << "\n\n" << std::endl;
     puzzle.printPuzzle();
+    std::cout << "\n\n" << std::endl;
+    puzzle.printPuzzle(false);
     // puzzle.printUnsolved();
 
     return 0;
