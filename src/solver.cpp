@@ -310,11 +310,13 @@ void Solver::guessAndCheck()
             // If the loop yields an invalid puzzle, then we know our test index cannot be test bit
             if (!goodness)
             {
+                // Remove test bit from the possible values at test index
                 *this->puzzle->ptrValue(test_idx) -= *this->puzzle->ptrValue(test_idx) & test_bit;
+
+                // Run another reduce loop on our true puzzle to squeeze out any benefits of this elimination
+                this->reduceLoop(this->puzzle);
             }
 
-            // Run a reduce loop on our true puzzle
-            this->reduceLoop(this->puzzle);
 
             // Increment the number of guesses we've made
             this->guesses++;
