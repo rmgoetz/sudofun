@@ -67,18 +67,14 @@ public:
 class Clue
 {
 private:
-    std::string clueString;
+    std::string clue_string;
 
 public:
-    Clue(const std::string &clueString)
-    {
-        this->clueString = validateString(clueString);
-    }
+    Clue(const std::string &clueString);
+    Iterator3 begin();
+    Iterator3 end();
 
     static std::string validateString(std::string clueString);
-
-    Iterator3 begin() { return Iterator3(clueString.begin()); }
-    Iterator3 end() { return Iterator3(clueString.end()); }
 };
 
 #endif

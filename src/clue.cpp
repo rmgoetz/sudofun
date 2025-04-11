@@ -2,6 +2,21 @@
 #include "clue.hpp"
 #include <iostream>
 
+Clue::Clue(const std::string &clueString)
+{
+    this->clue_string = this->validateString(clueString);
+}
+
+Iterator3 Clue::begin()
+{
+    return Iterator3(this->clue_string.begin());
+}
+
+Iterator3 Clue::end()
+{
+    return Iterator3(this->clue_string.end());
+}
+
 std::string Clue::validateString(std::string clueString)
 {
 
