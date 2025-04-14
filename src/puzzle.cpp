@@ -32,6 +32,9 @@ Puzzle::Puzzle()
     row_u_groups = INIT_ROW_GROUPS;
     col_u_groups = INIT_COL_GROUPS;
     blk_u_groups = INIT_BLK_GROUPS;
+
+    // Latest solved is empty, but reserve enough space to never need re-allocation
+    latest_solved_indices.reserve(81);
 }
 
 /**
@@ -753,6 +756,16 @@ void Puzzle::printPuzzle(bool nine_bit)
         if ((i + 1) % 9 == 0)
         {
             std::cout << std::endl;
+
+            if ((i + 1) % 27 == 0){
+                std::cout << "\n" << std::endl;
+                std::cout.flush();
+            }
+        }
+        else if ((i + 1) % 3 == 0)
+        {
+            std::cout << " ";
+            std::cout.flush();
         }
         else
         {
