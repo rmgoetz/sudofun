@@ -1,34 +1,52 @@
 /* An attempt to put everything together    */
 
-#include "clue.hpp"
-#include "puzzle.hpp"
-#include "solver.hpp"
-#include "utils.hpp"
+#include "run.hpp"
 #include <iostream>
-#include <tuple>
-#include <list>
 #include <array>
+#include <string>
+#include <string_view>
 
-int main()
+int main(int argc, char *argv[])
 {
-    std::string input_cluestring;
-    std::cout << "Enter a clue string for simple src: ";
-    std::cin >> input_cluestring;
-    std::cout.flush();
-    std::cout << "\n\n" << std::endl;
+
+    bool runConsole = false;
+    int maxGuesses = 1;
 
 
-    Clue clue = Clue(input_cluestring);
-    Puzzle puzzle = Puzzle();
-    puzzle.addClueString(&clue);
-    puzzle.printPuzzle(false);
-    std::cout << "\n\n" << std::endl;
-    std::cout.flush();
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
 
-    Solver solver = Solver(&puzzle);
-    solver.solve(1);
+        if (arg == "-C" || arg == "-c" || arg == "--console") {
+            runConsole = true;
+        }
+        else if (arg == "--max-guesses" && i + 1 < argc) {
+            maxGuesses = std::stoi(argv[++i]);  // parse next argument as int
+        }
+        else {
+            std::cerr << "Unknown or incomplete argument: " << arg << "\n";
+            return 1;
+        }
+    }
 
-    puzzle.printPuzzle(false);
+    // Parse input 
+
+#ifndef BUILT_WITH_QT5
+
+    runConsoleSolve(maxGuesses);
+
+#else
+
+    if (runConsole)
+    {
+        runConsoleSolve(maxGuesses);
+    }
+
+    else
+    {
+        runGuiSolve(maxGuesses, argc, argv);
+    }
 
     return 0;
+
+#endif
 }

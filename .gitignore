@@ -120,4 +120,9 @@ venv.bak/
 # Windows thumbnail files
 Thumbs.db
 
+# VS
+.vs
+CMakeSettings.json
+vcpkg*
+
 test/*

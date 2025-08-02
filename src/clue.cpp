@@ -2,22 +2,13 @@
 #include "clue.hpp"
 #include <iostream>
 
-Clue::Clue(const std::string &clueString)
+StringClue::StringClue(const std::string &clueString)
 {
     this->clue_string = this->validateString(clueString);
+    // this->clue_///////////string = clue_string;
 }
 
-Iterator3 Clue::begin()
-{
-    return Iterator3(this->clue_string.begin());
-}
-
-Iterator3 Clue::end()
-{
-    return Iterator3(this->clue_string.end());
-}
-
-std::string Clue::validateString(std::string clueString)
+std::string StringClue::validateString(std::string clueString)
 {
 
     std::string return_string;
@@ -54,4 +45,24 @@ std::string Clue::validateString(std::string clueString)
     }
 
     return return_string;
+}
+
+WindowClue::WindowClue(const VectorTuple &vectorClue)
+{
+    this->clue_vector = this->validateVector(vectorClue);
+}
+
+WindowClue::VectorTuple WindowClue::validateVector(WindowClue::VectorTuple vectorClue)
+{
+    // Every input must be between 1 and 9 inclusive
+    for (auto i : vectorClue)
+    {
+        uint32_t val = std::get<1>(i);
+        if ((val < 1) || (val > 9))
+        {
+            throw std::invalid_argument("Sudoku values must fall between 1 and 9, inclusive");
+        }
+    }
+
+    return vectorClue;
 }

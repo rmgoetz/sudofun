@@ -6,6 +6,8 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <tuple>
+#include <numeric>
 
 // Static class members
 const std::array<std::array<uint32_t, 3>, 81> *Puzzle::flat_to_row_col_block = &FLAT_TO_ROW_COL_BLK;
@@ -42,7 +44,7 @@ Puzzle::Puzzle()
  *
  * @param clue A clue which defines the puzzle
  */
-void Puzzle::addClueString(Clue *clue)
+void Puzzle::addClueString(StringClue *clue)
 {
 
     if (this->loaded_clue)
@@ -50,10 +52,16 @@ void Puzzle::addClueString(Clue *clue)
         throw std::runtime_error("A clue has already been added to this puzzle");
     }
 
-    for (auto i = clue->begin(); i != clue->end(); ++i)
+    size_t string_len = clue->clue_string.length();
+    if ((string_len % 3 != 0) || (string_len == 0))
     {
-        // Grab the three-character-long string corresponding to a single cell clue
-        std::string s = *i;
+        throw std::runtime_error("Clue has invalid length after validation?!");
+    }
+
+    // Iterate over triplet substrings of the cluestring
+    for (uint32_t i = 0; i < string_len; i += 3)
+    {
+        std::string s = clue->clue_string.substr(i, 3);
 
         // Convert clues to their index/value combination, remembering that cluestrings will
         // index starting at 1, not zero
@@ -80,6 +88,36 @@ void Puzzle::addClueString(Clue *clue)
     }
 
     this->removeFromUGroups(this->latest_solved_indices);
+}
+
+void Puzzle::addClueVector(WindowClue *clue)
+{
+
+    if (this->loaded_clue)
+    {
+        throw std::runtime_error("A clue has already been added to this puzzle");
+    }
+
+    for (auto i = clue->clue_vector.begin(); i != clue->clue_vector.end(); ++i)
+    {
+        auto [flat_index, val_num] = *i;
+
+        // Set the corresponding flat index to the value converted to a 9-bit representation
+        this->setValue(flat_index, utils::valueToNineBit(val_num));
+
+        // Add to the list of solved
+        this->latest_solved_indices.push_back(flat_index);
+
+        // Remove from the unsolved list
+        for (auto it = this->unsolved_indices.begin(); it != this->unsolved_indices.end(); ++it)
+        {
+            if (*it == flat_index)
+            {
+                this->unsolved_indices.erase(it);
+                break;
+            }
+        }
+    }
 }
 
 void Puzzle::setValue(uint32_t index, uint16_t val)
@@ -683,7 +721,7 @@ void Puzzle::checkUnsolved()
 std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> Puzzle::leastPopularBit()
 {
     std::array<uint16_t, 9> bits;
-    std::array<uint32_t, 9> multiplicity;
+    std::array<uint32_t, 9> multiplicity = {};
     std::array<std::vector<uint32_t>, 9> locations;
 
     // Count bit multiplicity for each bit amongst the unsolved elements
@@ -693,7 +731,7 @@ std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> Puzzle::le
         {
             bits[i] = 1 << i;
 
-            if (this->getValue(unsolved_idx) & 1 << i != 0)
+            if ((this->getValue(unsolved_idx) & (1 << i)) != 0)
             {
                 multiplicity[i]++;
                 locations[i].push_back(unsolved_idx);
@@ -701,19 +739,18 @@ std::tuple<std::vector<uint16_t>, std::vector<std::vector<uint32_t>>> Puzzle::le
         }
     }
 
-    // Sort the bits and locations by multiplicity, and then multiplicity itself
-    std::sort(bits.begin(), bits.end(), [&](uint16_t a, uint16_t b)
+    // Determine the index map which sort multiplicity by ascending value
+    // (least popular bits first)
+    std::vector<size_t> sort_map(9);
+    std::iota(sort_map.begin(), sort_map.end(), 0);
+    std::sort(sort_map.begin(), sort_map.end(), [&](size_t a, size_t b)
               { return multiplicity[a] < multiplicity[b]; });
-    std::sort(locations.begin(), locations.end(), [&](std::vector<uint32_t> a, std::vector<uint32_t> b)
-              { uint32_t a_index = std::find(locations.begin(), locations.end(), a) - locations.begin();
-                uint32_t b_index = std::find(locations.begin(), locations.end(), b) - locations.begin();
-                return multiplicity.at(a_index) < multiplicity.at(b_index); });
-    std::sort(multiplicity.begin(), multiplicity.end(), std::greater<uint32_t>());
 
-    // We want to remove anything with multiplicity of zero
+    // We want to remove anything with multiplicity of zero, and order the return
+    // by ascending multiplicity
     std::vector<uint16_t> bits_v;
     std::vector<std::vector<uint32_t>> loc_v;
-    for (uint32_t i = 0; i < 9; ++i)
+    for (auto i : sort_map)
     {
         if (multiplicity[i] > 0)
         {
@@ -757,8 +794,10 @@ void Puzzle::printPuzzle(bool nine_bit)
         {
             std::cout << std::endl;
 
-            if ((i + 1) % 27 == 0){
-                std::cout << "\n" << std::endl;
+            if ((i + 1) % 27 == 0)
+            {
+                std::cout << "\n"
+                          << std::endl;
                 std::cout.flush();
             }
         }
