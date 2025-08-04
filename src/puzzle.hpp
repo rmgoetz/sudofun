@@ -46,6 +46,7 @@ public:
     // Update from default puzzle with a clue string
     void addClueString(StringClue *clue);
     void addClueVector(WindowClue *clue);
+    void addBenchmarkString(std::string benchmarkString);
 
     // Setting and getting the puzzle data
     void setValue(uint32_t index, uint16_t val);

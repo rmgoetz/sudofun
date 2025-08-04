@@ -120,6 +120,37 @@ void Puzzle::addClueVector(WindowClue *clue)
     }
 }
 
+/**
+ * @brief The conventional form for puzzle strings is an 81 character long string where . represents
+ * a null entry. For benchmarks we're not interested in guardrails or safety checks.
+ * 
+ * @param benchmarkString 
+ */
+void Puzzle::addBenchmarkString(std::string benchmarkString)
+{
+    uint32_t removedCount = 0;
+    auto itBegin = this->unsolved_indices.begin();
+    for (uint32_t flat_index = 0; flat_index < 81; ++flat_index)
+    {
+        char s = benchmarkString[flat_index];
+        if (s != '.')
+        {
+            // Set the corresponding flat index to the value converted to a 9-bit representation
+            this->setValue(flat_index, utils::valueToNineBit(static_cast<uint32_t>(s - '0')));
+
+            // Add to the list of solved
+            this->latest_solved_indices.push_back(flat_index);
+
+            // Remove from the unsolved list
+            this->unsolved_indices.erase(itBegin - removedCount);
+
+            ++removedCount;
+        }
+    }
+
+    this->removeFromUGroups(this->latest_solved_indices);
+}
+
 void Puzzle::setValue(uint32_t index, uint16_t val)
 {
     data.at(index) = val;
