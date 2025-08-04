@@ -6,8 +6,9 @@
 #include <vector>
 #include <stdint.h>
 
-// Forward declare clue
-class Clue;
+// Forward declare clues
+class StringClue;
+class WindowClue;
 
 class Puzzle
 {
@@ -42,8 +43,9 @@ public:
     // Constructor
     Puzzle();
 
-    // Update from default puzzle with a clue
-    void addClueString(Clue *clue);
+    // Update from default puzzle with a clue string
+    void addClueString(StringClue *clue);
+    void addClueVector(WindowClue *clue);
 
     // Setting and getting the puzzle data
     void setValue(uint32_t index, uint16_t val);

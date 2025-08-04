@@ -93,6 +93,13 @@ void Solver::unique(Puzzle *puzzle, bool *updated)
     *updated |= initial_unsolved != puzzle->numUnsolved();
 }
 
+/**
+ * @brief A reduction method based on the pigeonhole principle. Currently not implemented
+ * because it appears to be redundant.
+ * 
+ * @param puzzle 
+ * @param updated 
+ */
 void Solver::pigeon(Puzzle *puzzle, bool *updated)
 {
     for (uint32_t i = 0; i < 9; ++i)
