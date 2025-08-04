@@ -42,6 +42,7 @@ private slots:
 #endif
   void onClearClicked();
   void onSolveClicked();
+  void invalidPuzzlePopup();
 
 private:
   QLineEdit *grid[N][N];

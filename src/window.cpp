@@ -1,19 +1,18 @@
 
 #if defined(BUILT_WITH_QT5)
 
-#include "window.hpp"
-#include "clue.hpp"
-#include "puzzle.hpp"
-#include "solver.hpp"
-#include "utils.hpp"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QIntValidator>
+#include <QMessageBox>
 
 #ifdef DEBUG_BUILD
 #include <QDebug>
 #endif
+
+#include "window.hpp"
+#include "solver.hpp"
 
 MainWindow::MainWindow(QWidget *parent, int maxGuesses) : QWidget(parent), maxGuesses(maxGuesses)
 {
@@ -64,7 +63,19 @@ void MainWindow::onSolveClicked()
     puzzle.addClueVector(&clue);
     Solver solver = Solver(&puzzle);
     solver.solve(maxGuesses);
-    this->solutionFromPuzzle(&puzzle);
+    if (puzzle.validPuzzle())
+    {
+        this->solutionFromPuzzle(&puzzle);
+    }
+    else
+    {
+        this->invalidPuzzlePopup();
+    }
+}
+
+void MainWindow::invalidPuzzlePopup()
+{
+    QMessageBox::information(this, "Invalid Puzzle", "Your input puzzle has no valid solution!");
 }
 
 WindowClue MainWindow::clueFromInputs()
@@ -173,6 +184,7 @@ void MainWindow::setupUI()
         }
     }
 
+    // For visual convenience, add dividers between groups of 9
     for (int i = 0; i < N + 2; ++i)
     {
         if (i == 3 || i == 7)
