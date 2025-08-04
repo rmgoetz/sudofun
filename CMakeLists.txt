@@ -13,6 +13,11 @@ find_package(Qt5 QUIET COMPONENTS Core Widgets)
 
 add_executable(sudofun ${SOURCES} ${HEADERS})
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(sudofun PRIVATE DEBUG_BUILD=1)
+endif()
+
+
 if (Qt5_FOUND)
     add_compile_definitions(sudofun PRIVATE BUILT_WITH_QT5=1)
     target_link_libraries(sudofun PRIVATE Qt5::Core Qt5::Widgets)

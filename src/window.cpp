@@ -10,7 +10,10 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QIntValidator>
+
+#ifdef DEBUG_BUILD
 #include <QDebug>
+#endif
 
 MainWindow::MainWindow(QWidget *parent, int maxGuesses) : QWidget(parent), maxGuesses(maxGuesses)
 {
@@ -18,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent, int maxGuesses) : QWidget(parent), maxGu
     connectSignals();
 }
 
+#ifdef DEBUG_BUILD
 void MainWindow::onCellChanged()
 {
     QLineEdit *input = qobject_cast<QLineEdit *>(sender());
@@ -37,10 +41,13 @@ void MainWindow::onCellChanged()
         }
     }
 }
+#endif
 
 void MainWindow::onClearClicked()
 {
+#ifdef DEBUG_BUILD
     qDebug() << "Clear button clicked - Clearing all cells";
+#endif
     for (int row = 0; row < N; ++row)
     {
         for (int col = 0; col < N; ++col)
@@ -193,6 +200,22 @@ void MainWindow::setupUI()
     solveButton = new QPushButton(solveText);
     clearButton = new QPushButton(clearText);
 
+    solveButton->setFixedHeight(static_cast<int>(static_cast<float>(cellSize) * 1.2));
+    solveButton->setFixedWidth(static_cast<int>(static_cast<float>(cellSize) * 6.2));
+
+    clearButton->setFixedHeight(static_cast<int>(static_cast<float>(cellSize) * 1.2));
+    clearButton->setFixedWidth(static_cast<int>(static_cast<float>(cellSize) * 2.8));
+
+    //solveButton->setMinimumHeight(cellSize / 2);
+    //solveButton->setMinimumWidth(cellSize);
+    //solveButton->setMaximumHeight(cellSize * 2);
+    //solveButton->setMaximumWidth(cellSize * 3);
+
+    //clearButton->setMinimumHeight(cellSize / 2);
+    //clearButton->setMinimumWidth(cellSize);
+    //clearButton->setMaximumHeight(cellSize * 2);
+    //clearButton->setMaximumWidth(cellSize * 3);
+
     // Style buttons
     clearButton->setStyleSheet(
         "QPushButton { "
@@ -201,6 +224,7 @@ void MainWindow::setupUI()
         "border: none; "
         "border-radius: 5px; "
         "padding: 8px 16px; "
+        "font-size: 12pt;"
         "font-weight: bold; "
         "}"
         "QPushButton:hover { "
@@ -217,6 +241,7 @@ void MainWindow::setupUI()
         "border: none; "
         "border-radius: 5px; "
         "padding: 8px 16px; "
+        "font-size: 20pt;"
         "font-weight: bold; "
         "}"
         "QPushButton:hover { "
@@ -228,9 +253,9 @@ void MainWindow::setupUI()
 
     // Add buttons to layout
     buttonLayout->addStretch();
-    buttonLayout->addWidget(clearButton);
-    buttonLayout->addSpacing(20);
     buttonLayout->addWidget(solveButton);
+    buttonLayout->addSpacing(20);
+    buttonLayout->addWidget(clearButton);
     buttonLayout->addStretch();
 
     // Add button layout to main layout
@@ -247,6 +272,7 @@ void MainWindow::setupUI()
 
 void MainWindow::connectSignals()
 {
+#ifdef DEBUG_BUILD
     // Connect all grid cells to the change handler
     for (int row = 0; row < N; ++row)
     {
@@ -256,6 +282,7 @@ void MainWindow::connectSignals()
                     this, SLOT(onCellChanged()));
         }
     }
+#endif
 
     // Connect buttons
     connect(clearButton, SIGNAL(clicked()), this, SLOT(onClearClicked()));

@@ -37,7 +37,9 @@ public:
   MainWindow(QWidget *parent = nullptr, int maxGuesses = 1);
 
 private slots:
+#ifdef DEBUG_BUILD
   void onCellChanged();
+#endif
   void onClearClicked();
   void onSolveClicked();
 
