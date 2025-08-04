@@ -6,5 +6,5 @@ from __future__ import with_statement
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-from sudofun.solve import *
-from sudofun.construct import *
+from sudofun_py.solve import *
+from sudofun_py.construct import *

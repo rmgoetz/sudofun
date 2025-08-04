@@ -1,8 +1,8 @@
 from setuptools import setup
 
-setup(name='sudofun',
+setup(name='sudofun_py',
       version='0.1',
-      description='A package for sudoku tools',
+      description='A Python package for solving sudoku',
       install_requires=[],
       classifiers=[
             'Development Status :: 1 - Planning',

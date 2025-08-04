@@ -206,16 +206,6 @@ void MainWindow::setupUI()
     clearButton->setFixedHeight(static_cast<int>(static_cast<float>(cellSize) * 1.2));
     clearButton->setFixedWidth(static_cast<int>(static_cast<float>(cellSize) * 2.8));
 
-    //solveButton->setMinimumHeight(cellSize / 2);
-    //solveButton->setMinimumWidth(cellSize);
-    //solveButton->setMaximumHeight(cellSize * 2);
-    //solveButton->setMaximumWidth(cellSize * 3);
-
-    //clearButton->setMinimumHeight(cellSize / 2);
-    //clearButton->setMinimumWidth(cellSize);
-    //clearButton->setMaximumHeight(cellSize * 2);
-    //clearButton->setMaximumWidth(cellSize * 3);
-
     // Style buttons
     clearButton->setStyleSheet(
         "QPushButton { "

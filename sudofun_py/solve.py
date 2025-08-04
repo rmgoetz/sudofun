@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sudofun
+import sudofun_py
 import time
 """
 This module contains code which allows the user to input a series of clues to 
