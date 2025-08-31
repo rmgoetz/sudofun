@@ -50,7 +50,7 @@ void runBenchmark(const std::string &filename, uint32_t maxGuesses, uint32_t loo
 
             elapsed_time_ns += std::chrono::duration_cast<duration>(end - start);
 
-            if (puzzle.numUnsolved() == 0)
+            if ((puzzle.numUnsolved() == 0) && (puzzle.validPuzzle()))
             {
                 ++solve_count;
             }
