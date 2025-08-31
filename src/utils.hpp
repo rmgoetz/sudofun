@@ -16,13 +16,42 @@ namespace utils
      */
     inline uint16_t countBits(uint16_t n)
     {
+        constexpr uint16_t u_0b101010101{341}; // 341 = 0b101010101
+        constexpr uint16_t u_0b010101010{170}; // 170 = 0b010101010
+        constexpr uint16_t u_0b100110011{307}; // 307 = 0b100110011
+        constexpr uint16_t u_0b011001100{204}; // 204 = 0b011001100
+        constexpr uint16_t u_0b100001111{271}; // 271 = 0b100001111
+        constexpr uint16_t u_0b011110000{240}; // 240 = 0b011110000
+        constexpr uint16_t u_0b011111111{127}; // 127 = 0b011111111
+        constexpr uint16_t u_0b100000000{256}; // 256 = 0b100000000
+
         uint16_t num = n;
-        num = (num & static_cast<uint16_t>(341)) + ((num & static_cast<uint16_t>(170)) >> 1); // 341 = 0b101010101 and 170 = 0b010101010
-        num = (num & static_cast<uint16_t>(307)) + ((num & static_cast<uint16_t>(204)) >> 2); // 307 = 0b100110011 and 204 = 0b011001100
-        num = (num & static_cast<uint16_t>(271)) + ((num & static_cast<uint16_t>(240)) >> 4); // 271 = 0b100001111 and 240 = 0b011110000
-        num = (num & static_cast<uint16_t>(127)) + ((num & static_cast<uint16_t>(256)) >> 8); // 127 = 0b011111111 and 256 = 0b100000000
+
+        num = (num & u_0b101010101) + ((num & u_0b010101010) >> 1);
+        num = (num & u_0b100110011) + ((num & u_0b011001100) >> 2);
+        num = (num & u_0b100001111) + ((num & u_0b011110000) >> 4);
+        num = (num & u_0b011111111) + ((num & u_0b100000000) >> 8);
 
         return num;
+    }
+
+    /**
+     * @brief Returns 0 if n has 0 or 1 hot bits in the first 9 bits. We use the fact that in binary
+     * representation, if more than two bits are nonzero, then adding with 511 (first 9 bits hot) will
+     * leave all but the lowest hot bit unchanged. For example:
+     *      
+     *      111111111
+     *    + 001001000
+     *      ---------
+     *     1001000111
+     * 
+     * @param n
+     * @return uint16_t
+     */
+    inline uint16_t zeroIfOneOrNoBits(uint16_t n)
+    {
+        constexpr uint16_t u_0_thru_9_hot{511};
+        return (u_0_thru_9_hot + n) & n;
     }
 
     /**

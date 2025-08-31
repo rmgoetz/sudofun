@@ -211,7 +211,7 @@ public:
         indices_to_remove.reserve(this->unsolved_indices.size());
         for (const uint32_t &puzzle_index : this->unsolved_indices)
         {
-            if (utils::countBits(this->getValue(puzzle_index)) == 1)
+            if (utils::zeroIfOneOrNoBits(this->getValue(puzzle_index)) == 0)
             {
                 // Add this index to latest solved
                 this->latest_solved_indices.push_back(puzzle_index);
