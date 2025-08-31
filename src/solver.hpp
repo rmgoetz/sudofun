@@ -60,37 +60,17 @@ public:
 
         for (const uint32_t &unsolved_idx : puzzle->unsolved_indices)
         {
+            // Determine what bits are unique to this unsolved index among either its row, column, or
+            // block
             uint16_t unique_bits = puzzle->uniqueUGroupBits(unsolved_idx);
+
+            // If the value is nonzero, then there is a unique bit in our unsolved element. Technically we have
+            // only checked that there are any unique bits, but our solver pipeline guarantees that as long as
+            // the clue is valid there will only ever be one unique bit when there are any.
             if (unique_bits != 0)
             {
                 puzzle->setValue(unsolved_idx, unique_bits);
-            }            
-
-
-            // // Determine the bits unique to the unsolved value among the unsolved row members
-            // uint16_t unique_bits = puzzle->uniqueURowBits(unsolved_idx);
-
-            // // If the value is nonzero, then there is a unique bit in our unsolved element. Technically we have
-            // // only checked that there are any unique bits, but our solver pipeline guarantees that as long as
-            // // the clue is valid there will only ever be one unique bit when there are any.
-            // if (unique_bits != 0)
-            // {
-            //     puzzle->setValue(unsolved_idx, unique_bits);
-            //     continue;
-            // }
-
-            // unique_bits = puzzle->uniqueUColBits(unsolved_idx);
-            // if (unique_bits != 0)
-            // {
-            //     puzzle->setValue(unsolved_idx, unique_bits);
-            //     continue;
-            // }
-
-            // unique_bits = puzzle->uniqueUBlkBits(unsolved_idx);
-            // if (unique_bits != 0)
-            // {
-            //     puzzle->setValue(unsolved_idx, unique_bits);
-            // }
+            }
         }
 
         // Update the unsolved and recently solved
@@ -152,7 +132,7 @@ public:
                 unique = unique_bits[n];
 
                 // If there are unique bits in a section, remove them from the unsolved non-row members of the blk
-                if (unique != 0)
+                if (unique != 0) // not necessary to check, but seems to no performance impact
                 {
                     for (uint16_t *gval : puzzle->uBlkValuesNotInRow(3 * (i / 3) + n, i))
                     {
@@ -174,7 +154,7 @@ public:
                 unique = unique_bits[n];
 
                 // If there are unique bits in a section, remove them from the non-col members of the blk
-                if (unique != 0)
+                if (unique != 0) // not necessary to check, but seems to no performance impact
                 {
                     for (uint16_t *gval : puzzle->uBlkValuesNotInCol(j / 3 + 3 * n, j))
                     {
@@ -193,7 +173,7 @@ public:
 
     /**
      * @brief In every block select the unsolved elements and check if any bit is unique to a row or column within
-     * the block. For each unique bit eliminate them from row/column members outside if the block.
+     * the block. For each unique bit eliminate them from row/column members outside of the block.
      *
      * @param puzzle
      * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
@@ -222,14 +202,14 @@ public:
                 uint16_t unique_col_bits = utils::bitsInSrcNotInRef(blk_in_col, blk_not_in_col);
 
                 // Remove those bits from non-block row/col members
-                if (unique_row_bits != 0)
+                if (unique_row_bits != 0) // not necessary to check, but seems to have performance advantage
                 {
                     for (uint16_t *gval : puzzle->uRowValuesNotInBlk(r, g))
                     {
                         *gval -= *gval & unique_row_bits;
                     }
                 }
-                if (unique_col_bits != 0)
+                if (unique_col_bits != 0) // not necessary to check, but seems to have performance advantage
                 {
                     for (uint16_t *gval : puzzle->uColValuesNotInBlk(c, g))
                     {
@@ -249,6 +229,7 @@ public:
     //--------------------------------------------------------------------------------------------//
     //--- Flow control ---------------------------------------------------------------------------//
     //--------------------------------------------------------------------------------------------//
+    
     void solveStack(Puzzle *puzzle, bool *updated)
     {
         strike(puzzle, updated);

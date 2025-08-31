@@ -438,44 +438,22 @@ public:
     }
 
     /**
-     * @brief For a solved cell specified by index, remove the bit from all of its groups, and
-     * remove the cell from the unsolved groups.
-     *
-     * @param strike_idx Flat index in puzzle
-     */
-    void strikeIdxFromPuzzle(uint32_t strike_idx)
-    {
-        uint32_t row_idx = maps::flatToRow(strike_idx);
-        uint32_t col_idx = maps::flatToCol(strike_idx);
-        uint32_t blk_idx = maps::flatToBlk(strike_idx);
-        uint16_t puzzle_value = this->getValue(strike_idx);
-
-        this->bitRemoveFromUGroup(&this->row_u_groups[row_idx], strike_idx, puzzle_value);
-        this->bitRemoveFromUGroup(&this->col_u_groups[col_idx], strike_idx, puzzle_value);
-        this->bitRemoveFromUGroup(&this->blk_u_groups[blk_idx], strike_idx, puzzle_value);
-    }
-
-    /**
-     * @brief For a set of solved cells specified by index, remove their bit from all of their groups,
-     * and remove the solved cells from the unsolved groups.
-     *
-     * @param strike_idx_vec Flat indices in puzzle
-     */
-    void strikeVecFromPuzzle(const std::vector<uint32_t> &strike_idx_vec)
-    {
-        for (const uint32_t &strike_idx : strike_idx_vec)
-        {
-            this->strikeIdxFromPuzzle(strike_idx);
-        }
-    }
-
-    /**
      * @brief For the most recently solved puzzle elements, remove their bit from all of their groups.
      *
      */
     void strikeLatestFromPuzzle()
     {
-        this->strikeVecFromPuzzle(this->latest_solved_indices);
+        for (const uint32_t &strike_idx : this->latest_solved_indices)
+        {
+            uint32_t row_idx = maps::flatToRow(strike_idx);
+            uint32_t col_idx = maps::flatToCol(strike_idx);
+            uint32_t blk_idx = maps::flatToBlk(strike_idx);
+            uint16_t puzzle_value = this->getValue(strike_idx);
+
+            this->bitRemoveFromUGroup(&this->row_u_groups[row_idx], strike_idx, puzzle_value);
+            this->bitRemoveFromUGroup(&this->col_u_groups[col_idx], strike_idx, puzzle_value);
+            this->bitRemoveFromUGroup(&this->blk_u_groups[blk_idx], strike_idx, puzzle_value);
+        }
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -672,7 +650,7 @@ public:
     {
         std::vector<uint16_t *> not_in_blk;
 
-        // WE ASSUME THE ROWS CORRESPOND TO ROWS THAT THE BLOCK INTERSECTS WITH
+        // WE ASSUME THE ROW INTERSECTS WITH THE BLOCK
         not_in_blk.reserve(6);
 
         // Loop over unsolved elements of the row
@@ -725,7 +703,14 @@ public:
     //--- Bit operations -------------------------------------------------------------------------//
     //--------------------------------------------------------------------------------------------//
 
-    uint16_t uniqueUGroupBits(uint32_t flat_index){
+    /**
+     * @brief Find any bits at the flat index which are unique to its row, column, or block.
+     *
+     * @param flat_index
+     * @return uint16_t
+     */
+    uint16_t uniqueUGroupBits(uint32_t flat_index)
+    {
         uint16_t unique_bits_row = this->getValue(flat_index);
         uint16_t unique_bits_col = this->getValue(flat_index);
         uint16_t unique_bits_blk = this->getValue(flat_index);
@@ -805,74 +790,9 @@ public:
         return unique_bits;
     }
 
-    // /**
-    //  * @brief Retrieves all bits in the unsolved row neighbors of an element
-    //  * with a specified flat index.
-    //  *
-    //  * @param flat_index
-    //  * @return uint16_t
-    //  */
-    // uint16_t rowNeighborBits(const uint32_t &flat_index)
-    // {
-    //     uint16_t neighbor_bits = 0;
-    //     // Accumulate all of the bits found amongst row neighbors
-    //     for (const uint32_t &neighbor_idx : *this->ptrRowUGroup(flat_index))
-    //     {
-    //         if (flat_index != neighbor_idx)
-    //         {
-    //             neighbor_bits |= this->getValue(neighbor_idx);
-    //         }
-    //     }
-
-    //     return neighbor_bits;
-    // }
-
-    // /**
-    //  * @brief Retrieves all bits in the unsolved column neighbors of an element
-    //  * with a specified flat index.
-    //  *
-    //  * @param flat_index
-    //  * @return uint16_t
-    //  */
-    // uint16_t colNeighborBits(const uint32_t &flat_index)
-    // {
-    //     uint16_t neighbor_bits = 0;
-    //     // Accumulate all of the bits found amongst col neighbors
-    //     for (const uint32_t &neighbor_idx : *this->ptrColUGroup(flat_index))
-    //     {
-    //         if (flat_index != neighbor_idx)
-    //         {
-    //             neighbor_bits |= this->getValue(neighbor_idx);
-    //         }
-    //     }
-
-    //     return neighbor_bits;
-    // }
-
-    // /**
-    //  * @brief Retrieves all bits in the unsolved block neighbors of an element
-    //  * with a specified flat index.
-    //  *
-    //  * @param flat_index
-    //  * @return uint16_t
-    //  */
-    // uint16_t blkNeighborBits(const uint32_t &flat_index)
-    // {
-    //     uint16_t neighbor_bits = 0;
-    //     // Accumulate all of the bits found amongst blk neighbors
-    //     for (const uint32_t &neighbor_idx : *this->ptrBlkUGroup(flat_index))
-    //     {
-    //         if (flat_index != neighbor_idx)
-    //         {
-    //             neighbor_bits |= this->getValue(neighbor_idx);
-    //         }
-    //     }
-
-    //     return neighbor_bits;
-    // }
-
     /**
-     * @brief
+     * @brief Sort bits by their multiplicity in the unsolved list, and also return their locations
+     * in the puzzle.
      *
      * @return std::tuple<std::vector<uint16_t>, std::vector<uint32_t>, std::vector<uint32_t>> The bit index, multiplicity, and locations in the puzzle
      */
