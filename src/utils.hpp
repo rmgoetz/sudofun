@@ -78,13 +78,13 @@ namespace utils
     }
 
     /**
-     * @brief
+     * @brief Returns the active bits in the src that are not in ref
      *
      * @param src
      * @param ref
      * @return uint16_t
      */
-    inline uint16_t bitsInSrcNotInRef(std::vector<uint16_t *> src, std::vector<uint16_t *> ref)
+    inline uint16_t bitsInSrcNotInRef(const std::vector<uint16_t *> &src, const std::vector<uint16_t *> &ref)
     {
         uint16_t src_bits = 0;
         uint16_t ref_bits = 0;
@@ -95,14 +95,11 @@ namespace utils
             src_bits |= *src_ptr;
         }
 
-        // Identify all active bits in reference
+        // Remove any bits in the ref
         for (const auto &ref_ptr : ref)
         {
-            ref_bits |= *ref_ptr;
+            src_bits &= (*ref_ptr ^ 511);
         }
-
-        // Determine which are unique to source
-        src_bits = src_bits & (ref_bits ^ 511);
 
         return src_bits;
     }
