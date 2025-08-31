@@ -6,41 +6,111 @@
 #include <stdint.h>
 #include <vector>
 
-extern const std::array<std::vector<uint32_t>, 9> INIT_ROW_GROUPS;
-extern const std::array<std::vector<uint32_t>, 9> INIT_COL_GROUPS;
-extern const std::array<std::vector<uint32_t>, 9> INIT_BLK_GROUPS;
-extern const std::vector<uint32_t> INIT_UNSOLVED_INDICES;
+namespace maps
+{
 
-/**
- * @brief Convert flat indices into row/col/blk indices
- *
- *  (row, col, blk) of ith cell -> FLAT_TO_ROW_COL_BLK[i]
- *
- */
-extern const std::array<std::array<uint32_t, 3>, 81> FLAT_TO_ROW_COL_BLK;
+    const std::array<std::vector<uint32_t>, 9> INIT_ROW_GROUPS = {{
+        {0, 1, 2, 3, 4, 5, 6, 7, 8},
+        {9, 10, 11, 12, 13, 14, 15, 16, 17},
+        {18, 19, 20, 21, 22, 23, 24, 25, 26},
+        {27, 28, 29, 30, 31, 32, 33, 34, 35},
+        {36, 37, 38, 39, 40, 41, 42, 43, 44},
+        {45, 46, 47, 48, 49, 50, 51, 52, 53},
+        {54, 55, 56, 57, 58, 59, 60, 61, 62},
+        {63, 64, 65, 66, 67, 68, 69, 70, 71},
+        {72, 73, 74, 75, 76, 77, 78, 79, 80},
+    }};
+    const std::array<std::vector<uint32_t>, 9> INIT_COL_GROUPS = {{
+        {0, 9, 18, 27, 36, 45, 54, 63, 72},
+        {1, 10, 19, 28, 37, 46, 55, 64, 73},
+        {2, 11, 20, 29, 38, 47, 56, 65, 74},
+        {3, 12, 21, 30, 39, 48, 57, 66, 75},
+        {4, 13, 22, 31, 40, 49, 58, 67, 76},
+        {5, 14, 23, 32, 41, 50, 59, 68, 77},
+        {6, 15, 24, 33, 42, 51, 60, 69, 78},
+        {7, 16, 25, 34, 43, 52, 61, 70, 79},
+        {8, 17, 26, 35, 44, 53, 62, 71, 80},
+    }};
+    const std::array<std::vector<uint32_t>, 9> INIT_BLK_GROUPS = {{
+        {0, 1, 2, 9, 10, 11, 18, 19, 20},
+        {3, 4, 5, 12, 13, 14, 21, 22, 23},
+        {6, 7, 8, 15, 16, 17, 24, 25, 26},
+        {27, 28, 29, 36, 37, 38, 45, 46, 47},
+        {30, 31, 32, 39, 40, 41, 48, 49, 50},
+        {33, 34, 35, 42, 43, 44, 51, 52, 53},
+        {54, 55, 56, 63, 64, 65, 72, 73, 74},
+        {57, 58, 59, 66, 67, 68, 75, 76, 77},
+        {60, 61, 62, 69, 70, 71, 78, 79, 80},
+    }};
+    const std::vector<uint32_t> INIT_UNSOLVED_INDICES = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 11, 12, 13, 14, 15, 16, 17,
+        18, 19, 20, 21, 22, 23, 24, 25, 26,
+        27, 28, 29, 30, 31, 32, 33, 34, 35,
+        36, 37, 38, 39, 40, 41, 42, 43, 44,
+        45, 46, 47, 48, 49, 50, 51, 52, 53,
+        54, 55, 56, 57, 58, 59, 60, 61, 62,
+        63, 64, 65, 66, 67, 68, 69, 70, 71,
+        72, 73, 74, 75, 76, 77, 78, 79, 80};
 
-/**
- * @brief Convert row/col/blk indices to flat puzzle indices
- *
- *  ith row contains the ROW_TO_FLAT[i] puzzle indices
- *
- */
-extern const std::array<std::array<uint32_t, 9>, 9> ROW_TO_FLAT;
-extern const std::array<std::array<uint32_t, 9>, 9> COL_TO_FLAT;
-extern const std::array<std::array<uint32_t, 9>, 9> BLK_TO_FLAT;
 
-/**
- * @brief Which row/col/blk is included in a given (col/blk)/(row/blk)/(row/col)
- *
- * Notably:
- *      ROW_TO_COL = COL_TO_ROW
- *      ROW_TO_BLK = BLK_TO_ROW
- */
-extern const std::array<std::array<uint32_t, 9>, 9> ROW_TO_COL;
-extern const std::array<std::array<uint32_t, 3>, 9> ROW_TO_BLK;
-extern const std::array<std::array<uint32_t, 9>, 9> COL_TO_ROW;
-extern const std::array<std::array<uint32_t, 3>, 9> COL_TO_BLK;
-extern const std::array<std::array<uint32_t, 3>, 9> BLK_TO_ROW;
-extern const std::array<std::array<uint32_t, 3>, 9> BLK_TO_COL;
+    /**
+     * @brief Conver flat indices to blk indices
+     */
+    constexpr std::array<uint32_t, 81> FLAT_TO_BLK = {
+        0, 0, 0, 1, 1, 1, 2, 2, 2, \
+        0, 0, 0, 1, 1, 1, 2, 2, 2, \
+        0, 0, 0, 1, 1, 1, 2, 2, 2, \
+        3, 3, 3, 4, 4, 4, 5, 5, 5, \
+        3, 3, 3, 4, 4, 4, 5, 5, 5, \
+        3, 3, 3, 4, 4, 4, 5, 5, 5, \
+        6, 6, 6, 7, 7, 7, 8, 8, 8, \
+        6, 6, 6, 7, 7, 7, 8, 8, 8, \
+        6, 6, 6, 7, 7, 7, 8, 8, 8, \
+    };
+
+    /**
+     * @brief Convert row/col/blk indices to flat puzzle indices
+     *
+     *  ith row contains the ROW_TO_FLAT[i] puzzle indices
+     *
+     */
+    constexpr std::array<std::array<uint32_t, 9>, 9> ROW_TO_FLAT = {{
+        {0, 1, 2, 3, 4, 5, 6, 7, 8},
+        {9, 10, 11, 12, 13, 14, 15, 16, 17},
+        {18, 19, 20, 21, 22, 23, 24, 25, 26},
+        {27, 28, 29, 30, 31, 32, 33, 34, 35},
+        {36, 37, 38, 39, 40, 41, 42, 43, 44},
+        {45, 46, 47, 48, 49, 50, 51, 52, 53},
+        {54, 55, 56, 57, 58, 59, 60, 61, 62},
+        {63, 64, 65, 66, 67, 68, 69, 70, 71},
+        {72, 73, 74, 75, 76, 77, 78, 79, 80},
+    }};
+    constexpr std::array<std::array<uint32_t, 9>, 9> COL_TO_FLAT = {{
+        {0, 9, 18, 27, 36, 45, 54, 63, 72},
+        {1, 10, 19, 28, 37, 46, 55, 64, 73},
+        {2, 11, 20, 29, 38, 47, 56, 65, 74},
+        {3, 12, 21, 30, 39, 48, 57, 66, 75},
+        {4, 13, 22, 31, 40, 49, 58, 67, 76},
+        {5, 14, 23, 32, 41, 50, 59, 68, 77},
+        {6, 15, 24, 33, 42, 51, 60, 69, 78},
+        {7, 16, 25, 34, 43, 52, 61, 70, 79},
+        {8, 17, 26, 35, 44, 53, 62, 71, 80},
+    }};
+
+    inline uint32_t flatToRow(uint32_t flat_index)
+    {
+        return flat_index / 9;
+    }
+    inline uint32_t flatToCol(uint32_t flat_index)
+    {
+        return flat_index % 9;
+    }
+    inline uint32_t flatToBlk(uint32_t flat_index)
+    {
+        return FLAT_TO_BLK[flat_index];
+    }
+
+} // maps
 
 #endif
