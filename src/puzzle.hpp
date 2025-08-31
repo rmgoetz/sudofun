@@ -29,6 +29,8 @@ public:
     std::vector<uint32_t> latest_solved_indices;
     std::vector<uint32_t> unsolved_indices;
 
+    std::array<uint32_t, 81> unsolved_index_map;
+
     // Constructor
     Puzzle()
     {
@@ -40,6 +42,7 @@ public:
 
         // Initialize helper members to hard-coded pre-computed vectors
         unsolved_indices = maps::INIT_UNSOLVED_INDICES;
+        unsolved_index_map = maps::INIT_UNSOLVED_INDEX_MAP;
         row_u_groups = maps::INIT_ROW_GROUPS;
         col_u_groups = maps::INIT_COL_GROUPS;
         blk_u_groups = maps::INIT_BLK_GROUPS;
@@ -131,6 +134,8 @@ public:
                 }
             }
         }
+
+        this->removeVecFromUGroups(this->latest_solved_indices);
     }
 
     /**
@@ -141,7 +146,7 @@ public:
      */
     void addBenchmarkString(const std::string &benchmarkString)
     {
-        uint32_t removedCount = 0;
+        uint32_t removedCount{0};
         auto itBegin = this->unsolved_indices.begin();
         for (uint32_t flat_index = 0; flat_index < 81; ++flat_index)
         {
@@ -368,23 +373,37 @@ public:
         }
     }
 
-    /**
-     * @brief Removes a given flat index from the unsolved groups
-     *
-     * @param cut_index
-     */
-    void removeIdxFromUGroups(uint32_t cut_index)
+    void removeFromURowGroupUnsafe(uint32_t row_index, uint32_t cut_index)
     {
-        // Convert to row, col, and blk indices
-        uint32_t row_idx = maps::flatToRow(cut_index);
-        uint32_t col_idx = maps::flatToCol(cut_index);
-        uint32_t blk_idx = maps::flatToBlk(cut_index);
+        uint32_t erase_idx{0};
+        uint32_t idx{0};
+        for (auto it = row_u_groups[row_index].begin(); it != row_u_groups[row_index].end(); ++it, ++idx)
+        {
+            erase_idx += idx * ((*it - cut_index) == 0);
+        }
+        row_u_groups[row_index].erase(row_u_groups[row_index].begin() + erase_idx);
+    }
 
-        // If the cut index is in the group, remove it (there will be at most one instance).
-        // NOTE: using std::find instead of this loop fails to compile on my build system
-        removeFromGroup(&this->row_u_groups[row_idx], cut_index);
-        removeFromGroup(&this->col_u_groups[col_idx], cut_index);
-        removeFromGroup(&this->blk_u_groups[blk_idx], cut_index);
+    void removeFromUColGroupUnsafe(uint32_t col_index, uint32_t cut_index)
+    {
+        uint32_t erase_idx{0};
+        uint32_t idx{0};
+        for (auto it = col_u_groups[col_index].begin(); it != col_u_groups[col_index].end(); ++it, ++idx)
+        {
+            erase_idx += idx * ((*it - cut_index) == 0);
+        }
+        col_u_groups[col_index].erase(col_u_groups[col_index].begin() + erase_idx);
+    }
+
+    void removeFromUBlkGroupUnsafe(uint32_t blk_index, uint32_t cut_index)
+    {
+        uint32_t erase_idx{0};
+        uint32_t idx{0};
+        for (auto it = blk_u_groups[blk_index].begin(); it != blk_u_groups[blk_index].end(); ++it, ++idx)
+        {
+            erase_idx += idx * ((*it - cut_index) == 0);
+        }
+        blk_u_groups[blk_index].erase(blk_u_groups[blk_index].begin() + erase_idx);
     }
 
     /**
@@ -396,7 +415,19 @@ public:
     {
         for (const uint32_t &cut_index : cut_vector)
         {
-            this->removeIdxFromUGroups(cut_index);
+            // Convert to row, col, and blk indices
+            uint32_t row_idx = maps::flatToRow(cut_index);
+            uint32_t col_idx = maps::flatToCol(cut_index);
+            uint32_t blk_idx = maps::flatToBlk(cut_index);
+
+            // If the cut index is in the group, remove it (there will be at most one instance).
+            // NOTE: using std::find instead of this loop fails to compile on my build system
+            removeFromURowGroupUnsafe(row_idx, cut_index);
+            removeFromUColGroupUnsafe(col_idx, cut_index);
+            removeFromUBlkGroupUnsafe(blk_idx, cut_index);
+            // removeFromGroup(&this->row_u_groups[row_idx], cut_index);
+            // removeFromGroup(&this->col_u_groups[col_idx], cut_index);
+            // removeFromGroup(&this->blk_u_groups[blk_idx], cut_index);
         }
     }
 
