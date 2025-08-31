@@ -17,7 +17,7 @@ To benchmark performance we test against the datasets provided at [this very hel
 
 | Dataset | Size (puzzles) | 0-Guess (puzzle/s) | 0-Guess Solved | w/Guess (puzzle/s) | w/Guess Solved |
 | --- | --- | --- | --- | --- | --- |
-| Easy | 100 000 | 36 400 | 100 000 (100%) | N/A | N/A |
-| Medium | 352 643 | 24 500 | 335 049 (95%) | 9 890 | 352 643 (100%) |
-| Hard | 321 592 | 15 800 | 63 937 (20%) | 985 | 321 592 (100%) |
-| Diabolical | 119 681 | 15 800 | 0 (0%) | 581 | 119 681 (100%) |
+| Easy | 100 000 | 39 700 | 100 000 (100%) | N/A | N/A |
+| Medium | 352 643 | 26 700 | 335 049 (95%) | 11 000 | 352 643 (100%) |
+| Hard | 321 592 | 17 200 | 63 937 (20%) | 1 110 | 321 592 (100%) |
+| Diabolical | 119 681 | 17 200 | 0 (0%) | 653 | 119 681 (100%) |

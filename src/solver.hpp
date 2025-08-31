@@ -25,7 +25,7 @@ public:
      * @param puzzle
      * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
      */
-    void strike(Puzzle *puzzle, bool *updated)
+    void strike(Puzzle *puzzle)
     {
         bool is_done = false;
 
@@ -41,9 +41,6 @@ public:
 
             // If we've added any solved indices, we're not done
             is_done = initial_unsolved == puzzle->numUnsolved();
-
-            // Track if we've made any update
-            *updated |= !is_done;
         }
     }
 
@@ -54,10 +51,8 @@ public:
      * @param puzzle
      * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
      */
-    void unique(Puzzle *puzzle, bool *updated)
+    void unique(Puzzle *puzzle)
     {
-        uint32_t initial_unsolved = puzzle->numUnsolved();
-
         for (const uint32_t &unsolved_idx : puzzle->unsolved_indices)
         {
             // Determine what bits are unique to this unsolved index among either its row, column, or
@@ -75,9 +70,6 @@ public:
 
         // Update the unsolved and recently solved
         postStepUpdate(puzzle);
-
-        // Track if we've made any update
-        *updated |= initial_unsolved != puzzle->numUnsolved();
     }
 
     /**
@@ -88,7 +80,7 @@ public:
      * @param updated
      */
     void
-    pigeon(Puzzle *puzzle, bool *updated)
+    pigeon(Puzzle *puzzle)
     {
         for (uint32_t i = 0; i < 9; ++i)
         {
@@ -112,10 +104,8 @@ public:
      * @param puzzle
      * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
      */
-    void squeeze(Puzzle *puzzle, bool *updated)
+    void squeeze(Puzzle *puzzle)
     {
-        uint32_t initial_unsolved = puzzle->numUnsolved();
-
         // Values to track unique bits
         std::array<uint16_t, 3> unique_bits;
         uint16_t unique;
@@ -166,9 +156,6 @@ public:
 
         // Update the unsolved and recently solved
         this->postStepUpdate(puzzle);
-
-        // Track if we've made any update
-        *updated |= initial_unsolved != puzzle->numUnsolved();
     }
 
     /**
@@ -178,10 +165,8 @@ public:
      * @param puzzle
      * @param updated A flag to track whether the solve stack has resulted in any updates to the puzzle
      */
-    void pipe(Puzzle *puzzle, bool *updated)
+    void pipe(Puzzle *puzzle)
     {
-        uint32_t initial_unsolved = puzzle->numUnsolved();
-
         // Loop over the blocks
         for (uint32_t g = 0; g < 9; ++g)
         {
@@ -221,23 +206,22 @@ public:
 
         // Update the unsolved and recently solved
         this->postStepUpdate(puzzle);
-
-        // Track if we've made any update
-        *updated |= initial_unsolved != puzzle->numUnsolved();
     }
 
     //--------------------------------------------------------------------------------------------//
     //--- Flow control ---------------------------------------------------------------------------//
     //--------------------------------------------------------------------------------------------//
-    
-    void solveStack(Puzzle *puzzle, bool *updated)
+
+    bool solveStack(Puzzle *puzzle)
     {
-        strike(puzzle, updated);
-        unique(puzzle, updated);
-        strike(puzzle, updated);
-        squeeze(puzzle, updated);
-        strike(puzzle, updated);
-        pipe(puzzle, updated);
+        uint32_t initial_unsolved = puzzle->numUnsolved();
+        strike(puzzle);
+        unique(puzzle);
+        strike(puzzle);
+        squeeze(puzzle);
+        strike(puzzle);
+        pipe(puzzle);
+        return initial_unsolved != puzzle->numUnsolved();
     }
 
     void postStepUpdate(Puzzle *puzzle)
@@ -257,15 +241,14 @@ public:
         while (keep_going)
         {
             // Run the solver stack and keep going if any of the methods yield a change
-            keep_going = false;
-            solveStack(puzzle, &keep_going);
+            keep_going = solveStack(puzzle);
 
             // Track the number of loop attempts we've made
             ++this->total_loops;
         }
 
         // Run one more strike for cleanup after the loop
-        strike(puzzle, &keep_going);
+        strike(puzzle);
     }
 
     void reduceLoop(Puzzle *puzzle, bool *goodness)
@@ -274,8 +257,7 @@ public:
         while (keep_going)
         {
             // Run the solver stack and keep going if any of the methods yield a change
-            keep_going = false;
-            solveStack(puzzle, &keep_going);
+            keep_going = solveStack(puzzle);
 
             // Track the number of loop attempts we've made
             ++this->total_loops;
@@ -286,7 +268,8 @@ public:
         }
 
         // Run one more strike for cleanup after the loop
-        strike(puzzle, &keep_going);
+        strike(puzzle);
+        *goodness = puzzle->validPuzzle();
     }
 
     // Guesser solver
